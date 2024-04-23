@@ -27,7 +27,7 @@ class DetachData(CalcMPEXP):
     ある放電についてデータを取得（igetfile）し，
     CSVファイルに書き込む
     '''
-    def __init__(self, shotNO='', type='', label = 0, remark='',about= 4, nl_line=1.86,savename='dataset_25_7.csv', diag_list='diagnames.csv'):
+    def __init__(self, shotNO='', type='', label = 0, remark='',about= 4, nl_line=1.86,savename='dataset_25_7.csv', diag_list='makedata/diagnames.csv'):
         # __init__()はインスタンス生成時に必ず実行されるメソッド（＝関数）
         # super().__init__()は，継承元クラスを__init__する
         super().__init__(shotNO=shotNO, type=type, label=label, remark=remark, about=about, nl_line=nl_line, savename=savename, diag_list=diag_list)
@@ -572,7 +572,7 @@ class DetachData(CalcMPEXP):
     datapath='./egdata/'
         
 
-def main(savename='dataset_25_7.csv',labelname='labels.csv',ion=None):
+def main(savename='makedata/dataset_25_7.csv',labelname='makedata/labels.csv',ion=None):
     '''main関数の説明
     1放電ごとに DetachData インスタンスを作り，
     CSVファイルに書き込んでいく

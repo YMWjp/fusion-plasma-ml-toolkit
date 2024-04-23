@@ -86,9 +86,10 @@ class eg_read():
         return f1(timelist)
 
 class GetFiles(object):
-    def __init__(self, shotNO, diag_list='diagnames.csv'):
+    def __init__(self, shotNO, diag_list='makedata/diagnames.csv'):
         self.shotNO = shotNO
         # import pdb; pdb.set_trace()
+        print(diag_list)
         self.diag_list = np.genfromtxt(diag_list,dtype='str',usecols=(0),delimiter=',')
         self.missing_list = []
 
