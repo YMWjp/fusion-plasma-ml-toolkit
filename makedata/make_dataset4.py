@@ -86,7 +86,7 @@ class eg_read():
         return f1(timelist)
 
 class GetFiles(object):
-    def __init__(self, shotNO, diag_list='makedata/diagnames.csv'):
+    def __init__(self, shotNO, diag_list='diagnames.csv'):
         self.shotNO = shotNO
         # import pdb; pdb.set_trace()
         print(diag_list)
@@ -105,6 +105,9 @@ class GetFiles(object):
             # print(self.shotNO.dtype)
             # import pdb; pdb.set_trace()
             print(outputname, ": not exist")
+            print("igetfile")
+            print("igetfile")
+            print("igetfile")
             
         # igetfile.py版
             try:

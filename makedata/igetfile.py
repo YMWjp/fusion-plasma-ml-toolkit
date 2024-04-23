@@ -90,6 +90,7 @@ def igetfile(diagname, shotno, subshot, outputname):
         if fn[-4:].upper() == '.ZIP':
             targetpath = fn
             targetfile = targetpath.split('/')[-1]
+            print("igetfile")
             print(targetpath) # support python 3
             print(targetfile)
             ftpGet(targetpath, targetfile)
