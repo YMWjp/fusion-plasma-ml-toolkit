@@ -17,6 +17,7 @@ from ftplib import FTP
 import zipfile
 import os
 from optparse import OptionParser
+import requests
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
@@ -30,6 +31,23 @@ def ftpGet(targetpath, outputpath):
     ftp.retrbinary(cmd, fpo.write)
     fpo.close()
     ftp.quit()
+
+def ftpGetFromHttp(shotNO,diagname,subshotNO=1,savename=''):
+    # import pdb; pdb.set_trace()
+    response = requests.get(
+        'http://exp.lhd.nifs.ac.jp/opendata/LHD/webapi.fcgi?cmd=getfile&diag={0}&shotno={1}&subno={2}'.format(diagname,shotNO,subshotNO)
+        )
+
+    if response.status_code == 200:
+        if savename == '':
+            savename = '{0}@{1}.dat'.format(diagname,shotNO)
+        with open(savename,'w') as f:
+            f.write(response.text)
+    else:
+        print(response.status_code)
+        print('error in HTTP request')
+    
+    return response.status_code
 
 def ftpList(targetpath):
     # import pdb; pdb.set_trace()
@@ -87,6 +105,8 @@ def igetfile(diagname, shotno, subshot, outputname):
     if 0 == len(filelist):
         return None
     for fn in filelist:
+
+
         if fn[-4:].upper() == '.ZIP':
             targetpath = fn
             targetfile = targetpath.split('/')[-1]
@@ -96,6 +116,9 @@ def igetfile(diagname, shotno, subshot, outputname):
             ftpGet(targetpath, targetfile)
             files = unzip(targetfile)
             os.rename(files[0], outputname)
+
+
+        # ftpGetFromHttp(shotno, diagname, subshot, outputname)
     return outputname
 
 if __name__ == '__main__':

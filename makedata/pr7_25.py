@@ -5,6 +5,7 @@ import sys
 import glob
 import datetime
 from getfile_dat import getfile_dat
+# from getfile_http_2024 import getdata
 from egdb_class import *
 
 import numpy as np
@@ -162,6 +163,7 @@ class DetachData(CalcMPEXP):
 
         def get_egdata(shotNO, diagname, valname):
             getfile_dat(shotNO, diagname, datapath=datapath)
+            # getdata(shotNO, diagname, subshotNO=1, savename=datapath)
             filename = datapath + '{0}@{1:d}.dat'.format(diagname,shotNO)
             egfile = egdb2d(filename)
             egfile.readFile()
@@ -344,6 +346,9 @@ class DetachData(CalcMPEXP):
             if rmp_lid_list[i] == 0:
                 rmp_lid_list[i] = 1
         rmp_lid_list = rmp_lid_list[rmp_no_list==shotNO]
+        print(rmp_lid_list)
+        print(rmp_lid_list)
+        print(rmp_lid_list)
         self.rmp_lid = [rmp_lid_list[0]]*len(self.time_list)
         self.rmp_lid = [n/abs(self.Bt) for n in self.rmp_lid]
         return 1

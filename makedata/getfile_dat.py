@@ -1,10 +1,3 @@
-"""
-    Usage: 
-        python3.x getfile_dat.py (shotNO) (diagname)
-    
-    Typical usage in other program file:
-        getfile_dat(shotNO(as int), diagname(as str))
-"""
 import os
 import sys
 # sys.path.append(os.path.join(os.path.dirname(__file__), '../PyLHD'))
