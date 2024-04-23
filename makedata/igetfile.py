@@ -32,21 +32,25 @@ def ftpGet(targetpath, outputpath):
     fpo.close()
     ftp.quit()
 
-def ftpGetFromHttp(shotNO,diagname,subshotNO=1,savename=''):
-    # import pdb; pdb.set_trace()
-    response = requests.get(
-        'http://exp.lhd.nifs.ac.jp/opendata/LHD/webapi.fcgi?cmd=getfile&diag={0}&shotno={1}&subno={2}'.format(diagname,shotNO,subshotNO)
-        )
+def ftpGetFromHttp(shotNO, diagname, subshotNO=1, savename=''):
+    # HTTPサーバーからデータを取得するURLを構築
+    url = 'http://exp.lhd.nifs.ac.jp/opendata/LHD/webapi.fcgi?cmd=getfile&diag={0}&shotno={1}&subno={2}'.format(diagname, shotNO, subshotNO)
+    response = requests.get(url)
 
+    # HTTPリクエストが成功した場合
     if response.status_code == 200:
+        # savenameが空の場合、デフォルトのファイル名を生成
         if savename == '':
-            savename = '{0}@{1}.dat'.format(diagname,shotNO)
-        with open(savename,'w') as f:
+            savename = '{0}@{1}.dat'.format(diagname, shotNO)
+        # テキストデータを指定されたファイル名で保存
+        with open(savename, 'w') as f:
             f.write(response.text)
     else:
+        # HTTPリクエストが失敗した場合、エラーを表示
         print(response.status_code)
         print('error in HTTP request')
     
+    # HTTPステータスコードを返す
     return response.status_code
 
 def ftpList(targetpath):
@@ -102,20 +106,21 @@ def igetfile(diagname, shotno, subshot, outputname):
     targetfolderpath = targetfolderpath + subfolder
     #print targetfolderpath
     filelist = ftpList(targetfolderpath)
-    if 0 == len(filelist):
-        return None
-    for fn in filelist:
+    ftpGetFromHttp(shotno, diagname, subshot, outputname)
+    # if 0 == len(filelist):
+    #     return None
+    # for fn in filelist:
 
 
-        if fn[-4:].upper() == '.ZIP':
-            targetpath = fn
-            targetfile = targetpath.split('/')[-1]
-            print("igetfile")
-            print(targetpath) # support python 3
-            print(targetfile)
-            ftpGet(targetpath, targetfile)
-            files = unzip(targetfile)
-            os.rename(files[0], outputname)
+    #     if fn[-4:].upper() == '.ZIP':
+    #         targetpath = fn
+    #         targetfile = targetpath.split('/')[-1]
+    #         print("igetfile")
+    #         print(targetpath) # support python 3
+    #         print(targetfile)
+    #         ftpGet(targetpath, targetfile)
+    #         files = unzip(targetfile)
+    #         os.rename(files[0], outputname)
 
 
         # ftpGetFromHttp(shotno, diagname, subshot, outputname)

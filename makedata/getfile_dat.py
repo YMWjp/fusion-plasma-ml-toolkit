@@ -19,7 +19,6 @@ def getfile_dat(shotNO, diag, datapath=''):
     try:
         print('igetfile start')
         if igetfile(diag, shotNO, 1, outputname) is None:
-            print('igetfile')
             print('shot:{0} diag:{1} is not exist'.format(shotNO, diag))
             isfile = -1
     except:

@@ -105,9 +105,6 @@ class GetFiles(object):
             # print(self.shotNO.dtype)
             # import pdb; pdb.set_trace()
             print(outputname, ": not exist")
-            print("igetfile")
-            print("igetfile")
-            print("igetfile")
             
         # igetfile.py版
             try:
