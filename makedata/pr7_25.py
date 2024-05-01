@@ -105,32 +105,44 @@ class DetachData(CalcMPEXP):
     
 
         return 1
+    
+    def get_gdn_info(self,file_path):
+        with open(file_path, 'r') as file:
+            lines = file.readlines()
+            for line in lines:
+                if 'gdn:' in line:
+                    gdn_info = line.split(':')[1].strip()
+                    gdn_info = gdn_info.split()
+                    gdn_info = [int(info) for info in gdn_info]
+                    return gdn_info
+        return None
 
     def get_Isat(self): #上書き
         # return super().get_Isat()
         if os.path.isfile("./DivIis_tor_sum@"+str(self.shotNO)+".dat"):
             eg = eg_read("./DivIis_tor_sum@"+str(self.shotNO)+".dat")
-            self.Isat_2L = eg.eg_f1('Iis_2L@20', self.time_list)
-            self.Isat_2R = eg.eg_f1('Iis_2R@20', self.time_list)
-            self.Isat_4L = eg.eg_f1('Iis_4L@20', self.time_list)
-            self.Isat_4R = eg.eg_f1('Iis_4R@20', self.time_list)
-            self.Isat_6L = eg.eg_f1('Iis_6L@20', self.time_list)
-            self.Isat_6R = eg.eg_f1('Iis_6R@20', self.time_list)
-            self.Isat_7L = eg.eg_f1('Iis_7L@20', self.time_list)
-            self.Isat_7R = eg.eg_f1('Iis_7R@20', self.time_list)
-            self.Isat_8L = eg.eg_f1('Iis_8L@20', self.time_list)
-            self.Isat_8R = eg.eg_f1('Iis_8R@20', self.time_list)
-            self.Isat_9L = eg.eg_f1('Iis_9L@20', self.time_list)
-            self.Isat_9R = eg.eg_f1('Iis_9R@20', self.time_list)
-            self.Isat_10L = eg.eg_f1('Iis_10L@20', self.time_list)
-            self.Isat_10R = eg.eg_f1('Iis_10R@19', self.time_list)
-            for i in range(20, 16, -1):
-                for nL in ['2L', '2R', '4L', '4R', '6L', '6R', '7L', '7R', '8L', '8R', '9L', '9R', '10L', '10R']:
-                    try:
-                        setattr(self, 'Isat_' + nL, eg.eg_f1('Iis_' + nL + '@' + str(i), self.time_list))
-                        break  # データが存在したらループを抜ける
-                    except:
-                        pass  # データが存在しない場合は何もしない
+            gdn_info = self.get_gdn_info("./DivIis_tor_sum@"+str(self.shotNO)+".dat")
+            print("gdn情報:", gdn_info, self.shotNO)
+            # self.Isat_2L = eg.eg_f1('Iis_2L@20', self.time_list)
+            # self.Isat_2R = eg.eg_f1('Iis_2R@20', self.time_list)
+            # self.Isat_4L = eg.eg_f1('Iis_4L@20', self.time_list)
+            # self.Isat_4R = eg.eg_f1('Iis_4R@20', self.time_list)
+            # self.Isat_6L = eg.eg_f1('Iis_6L@20', self.time_list)
+            # self.Isat_6R = eg.eg_f1('Iis_6R@20', self.time_list)
+            # self.Isat_7L = eg.eg_f1('Iis_7L@20', self.time_list)
+            # self.Isat_7R = eg.eg_f1('Iis_7R@20', self.time_list)
+            # self.Isat_8L = eg.eg_f1('Iis_8L@20', self.time_list)
+            # self.Isat_8R = eg.eg_f1('Iis_8R@20', self.time_list)
+            # self.Isat_9L = eg.eg_f1('Iis_9L@20', self.time_list)
+            # self.Isat_9R = eg.eg_f1('Iis_9R@20', self.time_list)
+            # self.Isat_10L = eg.eg_f1('Iis_10L@20', self.time_list)
+            # self.Isat_10R = eg.eg_f1('Iis_10R@20', self.time_list)
+            for nL in ['2L', '2R', '4L', '4R', '6L', '6R', '7L', '7R', '8L', '8R', '9L', '9R', '10L', '10R']:
+                try:
+                    print(gdn_info[0],nL,self.shotNO,"get data")
+                    setattr(self, 'Isat_' + nL, eg.eg_f1('Iis_' + nL + '@' + str(gdn_info[0]), self.time_list))
+                except:
+                    pass
             # time_list4R = self.time_list[self.Isat_4R>0]
             # isat_4R = self.Isat_4R[self.Isat_4R>0]
             # isat4R_f = interpolate.interp1d(time_list4R, isat_4R, kind='linear', bounds_error=False,fill_value=0)
