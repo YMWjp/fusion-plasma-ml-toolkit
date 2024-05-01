@@ -137,10 +137,10 @@ class DetachData(CalcMPEXP):
             # self.Isat_9R = eg.eg_f1('Iis_9R@20', self.time_list)
             # self.Isat_10L = eg.eg_f1('Iis_10L@20', self.time_list)
             # self.Isat_10R = eg.eg_f1('Iis_10R@20', self.time_list)
-            for nL in ['2L', '2R', '4L', '4R', '6L', '6R', '7L', '7R', '8L', '8R', '9L', '9R', '10L', '10R']:
+            for i, nL in enumerate(['2L', '2R', '4L', '4R', '6L', '6R', '7L', '7R', '8L', '8R', '9L', '9R', '10L', '10R']):
                 try:
-                    print(gdn_info[0],nL,self.shotNO,"get data")
-                    setattr(self, 'Isat_' + nL, eg.eg_f1('Iis_' + nL + '@' + str(gdn_info[0]), self.time_list))
+                    print(gdn_info[i],nL,self.shotNO,"get data")
+                    setattr(self, 'Isat_' + nL, eg.eg_f1('Iis_' + nL + '@' + str(gdn_info[i]), self.time_list))
                 except:
                     pass
             # time_list4R = self.time_list[self.Isat_4R>0]
