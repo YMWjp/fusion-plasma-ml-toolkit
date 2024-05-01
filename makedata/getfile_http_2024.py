@@ -9,12 +9,16 @@ def getdata(shotNO,diagname,subshotNO=1,savename=''):
 
     if response.status_code == 200:
         if savename == '':
-            savename = '{0}@{1}.dat'.format(diagname,shotNO)
-        with open(savename,'w') as f:
+            savename = './egdata/' + '{0}@{1}.dat'.format(diagname,shotNO)
+        print(savename)
+        with open(savename,mode='w') as f:
             f.write(response.text)
     else:
         print(response.status_code)
-        print('error in HTTP request')
+        print(diagname)
+        print(shotNO)
+        print(subshotNO)
+        print(f'error in HTTP request: {diagname} {shotNO} {subshotNO}')
     
     return response.status_code
 

@@ -42,6 +42,8 @@ class ExhaustiveSearch():
             use_parameters = self.header[4:len(self.header)]
 
         usecols_list = [self.header.index(x) for x in use_parameters]
+        print(usecols_list)
+        print(use_parameters)
         self.parameters = use_parameters
 
         # import pdb; pdb.set_trace()
@@ -92,6 +94,7 @@ class ExhaustiveSearch():
         
         if log:
             # import pdb; pdb.set_trace()
+            print(self.data)
             self.labels = self.labels[(self.data > 0).all(axis=1)]
             self.data = np.log(self.data[(self.data > 0).all(axis=1)])
         else:

@@ -4,8 +4,8 @@ import pdb
 import sys
 import glob
 import datetime
-from getfile_dat import getfile_dat
-# from getfile_http_2024 import getdata
+# from getfile_dat import getfile_dat
+from getfile_http_2024 import getdata
 from egdb_class import *
 
 import numpy as np
@@ -92,8 +92,8 @@ class DetachData(CalcMPEXP):
         self.get_ha1()
         self.get_te()
         self.ISS_Wp()
-        self.get_rmp_lid(shotNO)
-        self.get_SDLloop(shotNO)
+        # self.get_rmp_lid(shotNO)
+        # self.get_SDLloop(shotNO)
         # self.get_beta_e()
         # self.get_col(shotNO)
         # self.get_beta0(shotNO)
@@ -162,8 +162,8 @@ class DetachData(CalcMPEXP):
         datapath='./egdata/'
 
         def get_egdata(shotNO, diagname, valname):
-            getfile_dat(shotNO, diagname, datapath=datapath)
-            # getdata(shotNO, diagname, subshotNO=1, savename=datapath)
+            # getfile_dat(shotNO, diagname, datapath=datapath)
+            getdata(shotNO, diagname, subshotNO=1)
             filename = datapath + '{0}@{1:d}.dat'.format(diagname,shotNO)
             egfile = egdb2d(filename)
             egfile.readFile()
@@ -547,10 +547,10 @@ class DetachData(CalcMPEXP):
             'Te@center':self.Te_center,
             'Te@edge':self.Te_edge, 
             'ne@center':self.ne_center,
-            'RMP_LID':self.rmp_lid,
-            'SDLloop_dPhi':self.SDLloop_dphi,
-            'SDLloop_dPhi_ext':self.SDLloop_dphi_ext,
-            'SDLloop_dTheta':self.SDLloop_dtheta,
+            # 'RMP_LID':self.rmp_lid,
+            # 'SDLloop_dPhi':self.SDLloop_dphi,
+            # 'SDLloop_dPhi_ext':self.SDLloop_dphi_ext,
+            # 'SDLloop_dTheta':self.SDLloop_dtheta,
             # 'beta_e':self.beta_e,
             # 'collision':self.col,
             # 'beta0':self.beta0,

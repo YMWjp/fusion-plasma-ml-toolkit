@@ -35,7 +35,7 @@ parameters = [
     'beta',
     # 'Rax', 
     # 'rax_vmec', #'a99', #'delta_sh',
-    'D/(H+D)',
+    # 'D/(H+D)',
     'CIII', 
     'CIV', 'OV', 'OVI', 'FeXVI',
     # 'Ip',
@@ -47,8 +47,9 @@ parameters = [
     #'Te@center',
     # 'Te@edge',
     #, 'ne@center'#, 'ne_peak'
-    'RMP_LID'
-    ,'SDLloop_dPhi','SDLloop_dTheta'
+    # 'RMP_LID',
+    # 'SDLloop_dPhi',
+    # 'SDLloop_dTheta'
     # ,'beta_e','collision','beta0'
     # ,'fig6I', 'pcc3O', 'fig/pcc'
     # , 'ne_soxmos', 'ar_soxmos'

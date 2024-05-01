@@ -48,7 +48,7 @@ def ftpGetFromHttp(shotNO, diagname, subshotNO=1, savename=''):
     else:
         # HTTPリクエストが失敗した場合、エラーを表示
         print(response.status_code)
-        print('error in HTTP request')
+        print(f'error in HTTP request: {diagname} {shotNO} {subshotNO}')
     
     # HTTPステータスコードを返す
     return response.status_code

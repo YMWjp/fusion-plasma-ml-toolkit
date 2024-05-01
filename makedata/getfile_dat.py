@@ -27,20 +27,34 @@ from igetfile import *
 #     return isfile
 
 def getfile_dat(shotNO, diag, datapath=''):
+    # デバッグ用のコメントアウト（必要に応じて有効化してください）
     # import pdb; pdb.set_trace()
-    subshotNO = 1
-    response = requests.get(
-        'http://exp.lhd.nifs.ac.jp/opendata/LHD/webapi.fcgi?cmd=getfile&diag={0}&shotno={1}&subno={2}'.format(diag,shotNO,subshotNO)
-        )
 
+    subshotNO = 1  # サブショット番号の設定
+    # HTTPリクエスト用のURLを生成
+    url = 'http://exp.lhd.nifs.ac.jp/opendata/LHD/webapi.fcgi?cmd=getfile&diag={}&shotno={}&subno={}'.format(diag, shotNO, subshotNO)
+
+    # HTTPリクエストを送信
+    response = requests.get(url)
+
+    # データパスの設定（デフォルトの場合はファイル名を生成）
+    if datapath == '':
+        datapath = '{0}@{1}.dat'.format(diag, shotNO)
+
+    # レスポンスの処理
     if response.status_code == 200:
-        if datapath == '':
-            datapath = '{0}@{1}.dat'.format(diag,shotNO)
-        with open(datapath,'w') as f:
+        # ファイルが存在するかチェック
+        if os.path.isfile(datapath):
+            print(datapath, ": exist")
+            return 1
+        # ファイルが存在しない場合は新しく作成
+        with open(datapath, 'w') as f:
             f.write(response.text)
+        print(datapath, ": created")
     else:
-        print(response.status_code)
-        print('error in HTTP request')
+        # ステータスコードとエラーメッセージを出力
+        print('Error in HTTP request:', response.status_code)
+        print('Failed request URL:', url)
     
     return response.status_code
 
