@@ -8,6 +8,9 @@
 3.  →
     python F1score.py -d [date]
 
+4.  →
+    python pr9_5.py
+
 変更点
 numpy のバージョンアップに対応
 

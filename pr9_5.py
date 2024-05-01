@@ -6,7 +6,7 @@ from numpy.core.function_base import linspace
 from common import names_dict
 
 # result内のフォルダを選択する
-date = '20240426'
+date = '20240430'
 datapath = './results/'+date+'/dataset.csv'
 datapath2 = './results/'+date+'/label.csv'
 

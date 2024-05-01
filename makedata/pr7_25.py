@@ -111,32 +111,49 @@ class DetachData(CalcMPEXP):
         if os.path.isfile("./DivIis_tor_sum@"+str(self.shotNO)+".dat"):
             eg = eg_read("./DivIis_tor_sum@"+str(self.shotNO)+".dat")
             self.Isat_2L = eg.eg_f1('Iis_2L@20', self.time_list)
-            self.Isat_2R = eg.eg_f1('Iis_2R@19', self.time_list)
+            self.Isat_2R = eg.eg_f1('Iis_2R@20', self.time_list)
             self.Isat_4L = eg.eg_f1('Iis_4L@20', self.time_list)
-            self.Isat_4R = eg.eg_f1('Iis_4R@19', self.time_list)
-            time_list4R = self.time_list[self.Isat_4R>0]
-            isat_4R = self.Isat_4R[self.Isat_4R>0]
-            isat4R_f = interpolate.interp1d(time_list4R, isat_4R, kind='linear', bounds_error=False,fill_value=0)
-            self.Isat_4R = isat4R_f(self.time_list)
-            # self.Isat_6L = eg.eg_f1('Iis_6L@18', self.time_list)
-            if self.shotNO>=171355&self.shotNO<=171387:
-                self.Isat_6L = eg.eg_f1('Iis_6L@19', self.time_list)
-            else:
-                self.Isat_6L = eg.eg_f1('Iis_6L@20', self.time_list)
-            time_list6L = self.time_list[self.Isat_6L>0]
-            isat_6L = self.Isat_6L[self.Isat_6L>0]
-            isat6L_f = interpolate.interp1d(time_list6L, isat_6L, kind='linear', bounds_error=False,fill_value=0)
-            self.Isat_6L = isat6L_f(self.time_list)
-            self.Isat_6R = eg.eg_f1('Iis_6R@6', self.time_list)
-            # self.Isat_7L = eg.eg_f1('Iis_7L@19', self.time_list)
+            self.Isat_4R = eg.eg_f1('Iis_4R@20', self.time_list)
+            self.Isat_6L = eg.eg_f1('Iis_6L@20', self.time_list)
+            self.Isat_6R = eg.eg_f1('Iis_6R@20', self.time_list)
             self.Isat_7L = eg.eg_f1('Iis_7L@20', self.time_list)
-            self.Isat_7R = eg.eg_f1('Iis_7R@19', self.time_list)
+            self.Isat_7R = eg.eg_f1('Iis_7R@20', self.time_list)
             self.Isat_8L = eg.eg_f1('Iis_8L@20', self.time_list)
             self.Isat_8R = eg.eg_f1('Iis_8R@20', self.time_list)
-            self.Isat_9L = eg.eg_f1('Iis_9L@14', self.time_list)
-            self.Isat_9R = eg.eg_f1('Iis_9R@19', self.time_list)
-            self.Isat_10L = eg.eg_f1('Iis_10L@19', self.time_list)
-            self.Isat_10R = eg.eg_f1('Iis_10R@20', self.time_list)
+            self.Isat_9L = eg.eg_f1('Iis_9L@20', self.time_list)
+            self.Isat_9R = eg.eg_f1('Iis_9R@20', self.time_list)
+            self.Isat_10L = eg.eg_f1('Iis_10L@20', self.time_list)
+            self.Isat_10R = eg.eg_f1('Iis_10R@19', self.time_list)
+            for i in range(20, 16, -1):
+                for nL in ['2L', '2R', '4L', '4R', '6L', '6R', '7L', '7R', '8L', '8R', '9L', '9R', '10L', '10R']:
+                    try:
+                        setattr(self, 'Isat_' + nL, eg.eg_f1('Iis_' + nL + '@' + str(i), self.time_list))
+                        break  # データが存在したらループを抜ける
+                    except:
+                        pass  # データが存在しない場合は何もしない
+            # time_list4R = self.time_list[self.Isat_4R>0]
+            # isat_4R = self.Isat_4R[self.Isat_4R>0]
+            # isat4R_f = interpolate.interp1d(time_list4R, isat_4R, kind='linear', bounds_error=False,fill_value=0)
+            # self.Isat_4R = isat4R_f(self.time_list)
+            # # self.Isat_6L = eg.eg_f1('Iis_6L@18', self.time_list)
+            # if self.shotNO>=171355&self.shotNO<=171387:
+            #     self.Isat_6L = eg.eg_f1('Iis_6L@19', self.time_list)
+            # else:
+            #     self.Isat_6L = eg.eg_f1('Iis_6L@20', self.time_list)
+            # time_list6L = self.time_list[self.Isat_6L>0]
+            # isat_6L = self.Isat_6L[self.Isat_6L>0]
+            # isat6L_f = interpolate.interp1d(time_list6L, isat_6L, kind='linear', bounds_error=False,fill_value=0)
+            # self.Isat_6L = isat6L_f(self.time_list)
+            # self.Isat_6R = eg.eg_f1('Iis_6R@6', self.time_list)
+            # # self.Isat_7L = eg.eg_f1('Iis_7L@19', self.time_list)
+            # self.Isat_7L = eg.eg_f1('Iis_7L@20', self.time_list)
+            # self.Isat_7R = eg.eg_f1('Iis_7R@19', self.time_list)
+            # self.Isat_8L = eg.eg_f1('Iis_8L@20', self.time_list)
+            # self.Isat_8R = eg.eg_f1('Iis_8R@20', self.time_list)
+            # self.Isat_9L = eg.eg_f1('Iis_9L@14', self.time_list)
+            # self.Isat_9R = eg.eg_f1('Iis_9R@19', self.time_list)
+            # self.Isat_10L = eg.eg_f1('Iis_10L@19', self.time_list)
+            # self.Isat_10R = eg.eg_f1('Iis_10R@20', self.time_list)
         else:
             self.Isat_2L = np.zeros_like(self.time_list)
             self.Isat_2R = np.zeros_like(self.time_list)
