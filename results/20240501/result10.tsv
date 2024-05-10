@@ -1,0 +1,2 @@
+Combination	weight0	weight1	weight2	weight3	weight4	weight5	weight6	weight7	weight8	weight9	bias	TruePositive	FalsePositive	Accuracy	Precision	F1score	TruePositive_std	FalsePositive_std	Accuracy_std	Precision_std	F1score_std
+0,1,2,3,4,5,6,7,8,9	-0.7150179759750064	0.0	0.8199393154391119	-2.831951935902702	-0.8405088633006784	2.012554718945888	-1.1375845522648251	1.2961577158737745	1.755607263783412	0.9836051769339133	-2.0067826138805516	1.0	0.0	1.0	1.0	1.0	0.0	0.0	0.0	0.0	0.0

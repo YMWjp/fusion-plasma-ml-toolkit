@@ -93,7 +93,7 @@ class DetachData(CalcMPEXP):
         self.get_te()
         self.ISS_Wp()
         # self.get_rmp_lid(shotNO)
-        # self.get_SDLloop(shotNO)
+        self.get_SDLloop(shotNO)
         # self.get_beta_e()
         # self.get_col(shotNO)
         # self.get_beta0(shotNO)
@@ -577,9 +577,9 @@ class DetachData(CalcMPEXP):
             'Te@edge':self.Te_edge, 
             'ne@center':self.ne_center,
             # 'RMP_LID':self.rmp_lid,
-            # 'SDLloop_dPhi':self.SDLloop_dphi,
-            # 'SDLloop_dPhi_ext':self.SDLloop_dphi_ext,
-            # 'SDLloop_dTheta':self.SDLloop_dtheta,
+            'SDLloop_dPhi':self.SDLloop_dphi,
+            'SDLloop_dPhi_ext':self.SDLloop_dphi_ext,
+            'SDLloop_dTheta':self.SDLloop_dtheta,
             # 'beta_e':self.beta_e,
             # 'collision':self.col,
             # 'beta0':self.beta0,
@@ -640,7 +640,7 @@ def main(savename='dataset_25_7.csv',labelname='labels.csv',ion=None):
                 # 'RMP_LID',
 
                 # 現在使用できない
-                # 'SDLloop_dPhi','SDLloop_dPhi_ext','SDLloop_dTheta',
+                'SDLloop_dPhi','SDLloop_dPhi_ext','SDLloop_dTheta',
 
                 # 'beta_e','collision','beta0'
                 # ,'fig6I','pcc3O','fig/pcc'

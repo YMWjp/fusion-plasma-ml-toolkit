@@ -1535,6 +1535,7 @@ class CalcMPEXP(GetFiles):
         self.Isat_7L1 = self.Isat_7L[self.Isat_7L>0]
         self.Isat_4R2 = self.Isat_4R[self.Isat_4R>0]
 
+        # Isatで使用するもの
         axes[5].plot(self.time_list, self.Isat_6L)
         axes[5].plot(self.time_list2, self.Isat_4R2)
         axes[5].set_ylabel(r'$Isat_{7L}$[A]',fontsize=14)
@@ -1569,14 +1570,14 @@ class CalcMPEXP(GetFiles):
         # axes[10].set_ylabel(r'$H_\alpha$',fontsize=14)
         # axes[10].legend(loc='upper right')
 
-        # axes[10].plot(self.time_list, self.SDLloop_dphi, label='dphi')
+        axes[10].plot(self.time_list, self.SDLloop_dphi, label='dphi')
         axes[10].set_ylabel(r'$\Delta\Phi_{eff}$',fontsize=12)
-        # axes[11].plot(self.time_list, self.SDLloop_dtheta, label='dtheta')
         axes[11].plot(self.time_list, self.CIII, label='dtheta')
         axes[11].set_ylabel(r'$\mathrm{CIII}$',fontsize=12)
         # axes[12].plot(self.time_list, self.ne_soxmos, label='Ne')
         # axes[12].plot(self.time_list, self.ar_soxmos, label='Ar')
-        axes[12].set_ylabel(r'$\mathrm{soxmos}$',fontsize=12)
+        axes[12].plot(self.time_list, self.SDLloop_dtheta, label='dtheta')
+        axes[12].set_ylabel(r'$\Delta\Theta_{eff}$',fontsize=12)
         axes[12].legend(loc='upper right')
 
         for i in range(len(axes)):
