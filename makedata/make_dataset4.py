@@ -1560,9 +1560,7 @@ class CalcMPEXP(GetFiles):
         # axes[4].plot(self.time_list8R, self.Isat_8R1, label='Isat_8R')
         # axes[4].set_ylabel(r'$Isat_{8}$[A]',fontsize=13)
 
-        self.time_list7L = self.time_list[self.Isat_7L>0]
-        self.Isat_7L1 = self.Isat_7L[self.Isat_7L>0]
-        axes[5].plot(self.time_list7L, self.Isat_7L1, label='Isat_7L')
+        axes[5].plot(self.time_list, self.Isat_7L, label='Isat_7L')
         axes[5].set_ylabel(r'$Isat_{7}$[A]',fontsize=13)
 
         # axes[6].plot(self.time_list10L, self.Isat_10L1, label='Isat_10L')

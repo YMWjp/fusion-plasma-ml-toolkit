@@ -122,7 +122,6 @@ class DetachData(CalcMPEXP):
         if os.path.isfile("./DivIis_tor_sum@"+str(self.shotNO)+".dat"):
             eg = eg_read("./DivIis_tor_sum@"+str(self.shotNO)+".dat")
             gdn_info = self.get_gdn_info("./DivIis_tor_sum@"+str(self.shotNO)+".dat")
-            print("gdn情報:", gdn_info, self.shotNO)
             # self.Isat_2L = eg.eg_f1('Iis_2L@20', self.time_list)
             # self.Isat_2R = eg.eg_f1('Iis_2R@20', self.time_list)
             # self.Isat_4L = eg.eg_f1('Iis_4L@20', self.time_list)
@@ -139,7 +138,6 @@ class DetachData(CalcMPEXP):
             # self.Isat_10R = eg.eg_f1('Iis_10R@20', self.time_list)
             for i, nL in enumerate(['2L', '2R', '4L', '4R', '6L', '6R', '7L', '7R', '8L', '8R', '9L', '9R', '10L', '10R']):
                 try:
-                    print(gdn_info[i],nL,self.shotNO,"get data")
                     setattr(self, 'Isat_' + nL, eg.eg_f1('Iis_' + nL + '@' + str(gdn_info[i]), self.time_list))
                 except:
                     pass
@@ -194,7 +192,7 @@ class DetachData(CalcMPEXP):
             self.Isat_10R = np.zeros_like(self.time_list)
         return 1
 
-    def def_types(self,shotNO):
+    def def_types(self, shotNO):
         '''各時刻のラベルを self.type_list に格納する'''
 
         datapath = './egdata/'
@@ -209,38 +207,42 @@ class DetachData(CalcMPEXP):
             data = np.array(egfile.data[egfile.valname2idx(valname)])
             return time, data
 
-        # データ取得
-        wp_time, wp_data = get_egdata(shotNO, 'wp', 'Wp')
-        wp_grad = np.gradient(wp_data)
-        wp_min_time = wp_time[np.argmin(wp_grad)]
-        wp_time_0 = wp_time[wp_data > 50]
-        wp_max_time = wp_time_0[0]
+        try:
+            # データ取得
+            wp_time, wp_data = get_egdata(shotNO, 'wp', 'Wp')
+            wp_grad = np.gradient(wp_data)
+            wp_min_time = wp_time[np.argmin(wp_grad)]
+            wp_time_0 = wp_time[wp_data > 50]
+            wp_max_time = wp_time_0[0]
 
-        # isat7L データの移動平均と勾配の計算
-        isat7L_time = self.time_list
-        isat7L_data = self.Isat_7L
-        window = 20  # 移動平均の範囲
-        w = np.ones(window) / window
-        isat7L_data_s = np.convolve(isat7L_data, w, mode='same')
-        isat7L_grad = np.gradient(isat7L_data_s)
-        isat7L_grad = isat7L_grad[isat7L_time < wp_min_time - 0.1]
-        isat7L_time_g = isat7L_time[isat7L_time < wp_min_time - 0.1]
-        isat7L_grad_max = max(isat7L_grad)
+            # isat7L データの移動平均と勾配の計算
+            isat7L_time = self.time_list
+            isat7L_data = self.Isat_7L
+            
+            # 動的な移動平均ウィンドウサイズの決定
+            window = max(1, len(isat7L_data) // 50)
+            w = np.ones(window) / window
+            isat7L_data_s = np.convolve(isat7L_data, w, mode='same')
+            isat7L_grad = np.gradient(isat7L_data_s)
+            
+            # データ範囲を制限
+            valid_indices = isat7L_time < wp_min_time - 0.1
+            isat7L_grad = isat7L_grad[valid_indices]
+            isat7L_time_g = isat7L_time[valid_indices]
 
-        # 最大勾配の時間を取得
-        if isat7L_grad_max > 0.003:
-            isat7L_grad_max_time = isat7L_time_g[np.argmax(isat7L_grad)]
-        else:
-            isat7L_grad_max_time = wp_min_time - 0.1
+            # 動的な閾値の設定
+            isat7L_grad_max = max(isat7L_grad)
+            grad_threshold = np.percentile(np.abs(isat7L_grad), 95)
+            higher_grad_threshold = grad_threshold * 1.5  # 厳しい条件のための閾値を設定
+            isat7L_grad_max_time = isat7L_time_g[np.argmax(isat7L_grad)] if isat7L_grad_max > grad_threshold else wp_min_time - 0.1
 
-        isat7L_grad2 = isat7L_grad[isat7L_time_g > isat7L_grad_max_time]
-        isat7L_time2 = isat7L_time_g[isat7L_time_g > isat7L_grad_max_time]
+            isat7L_grad2 = isat7L_grad[isat7L_time_g > isat7L_grad_max_time]
+            isat7L_time2 = isat7L_time_g[isat7L_time_g > isat7L_grad_max_time]
 
-        self.type_list = np.ones_like(self.time_list)
+            self.type_list = np.ones_like(self.time_list)
 
-        if len(isat7L_grad2) != 0 and min(isat7L_grad2) < -0.03:
-            retouch_time = isat7L_time2[np.argmin(isat7L_grad2)]
-            if retouch_time - isat7L_grad_max_time > 0.4:
+            if len(isat7L_grad2) != 0 and min(isat7L_grad2) < -higher_grad_threshold:
+                retouch_time = isat7L_time2[np.argmin(isat7L_grad2)]
                 type_list = [
                     0 if t < isat7L_grad_max_time - 0.2
                     else 1 if t < isat7L_grad_max_time - 0.1
@@ -253,62 +255,48 @@ class DetachData(CalcMPEXP):
                     else 0
                     for t in self.time_list
                 ]
-            elif retouch_time - isat7L_grad_max_time > 0.2:
+
+
+            elif wp_min_time - isat7L_grad_max_time < 0.2:
                 type_list = [
                     0 if t < isat7L_grad_max_time - 0.2
                     else 1 if t < isat7L_grad_max_time - 0.1
-                    else 0 if t < isat7L_grad_max_time + 0.1
-                    else -1 if t < retouch_time - 0.1
-                    else 0 if t < retouch_time + 0.1
-                    else 1 if t < retouch_time + 0.2
                     else 0
                     for t in self.time_list
                 ]
             else:
-                type_list = [
-                    0 if t < isat7L_grad_max_time - 0.2
-                    else 1 if t < isat7L_grad_max_time - 0.1
-                    else 0 if t < retouch_time + 0.1
-                    else 1 if t < retouch_time + 0.2
-                    else 0
-                    for t in self.time_list
-                ]
-        elif wp_min_time - isat7L_grad_max_time < 0.2:
-            type_list = [
-                0 if t < isat7L_grad_max_time - 0.2
-                else 1 if t < isat7L_grad_max_time - 0.1
-                else 0
-                for t in self.time_list
-            ]
-        else:
-            isat7L_data_s = isat7L_data_s[isat7L_time < wp_min_time - 0.1]
-            isat7L_data3 = isat7L_data_s[isat7L_time_g >= isat7L_grad_max_time]
-            isat7L_time3 = isat7L_time_g[isat7L_time_g >= isat7L_grad_max_time]
-            isat7L_data3 = isat7L_data3[isat7L_time3 < isat7L_grad_max_time + 0.25]
-            isat7L_time3 = isat7L_time3[isat7L_time3 < isat7L_grad_max_time + 0.25]
-            detach_start_time = isat7L_time3[np.argmin(isat7L_data3)]
+                isat7L_data_s = isat7L_data_s[isat7L_time < wp_min_time - 0.1]
+                isat7L_data3 = isat7L_data_s[isat7L_time_g >= isat7L_grad_max_time]
+                isat7L_time3 = isat7L_time_g[isat7L_time_g >= isat7L_grad_max_time]
+                isat7L_data3 = isat7L_data3[isat7L_time3 < isat7L_grad_max_time + 0.25]
+                isat7L_time3 = isat7L_time3[isat7L_time3 < isat7L_grad_max_time + 0.25]
+                detach_start_time = isat7L_time3[np.argmin(isat7L_data3)]
 
-            if detach_start_time + 0.05 > isat7L_grad_max_time + 0.2:
-                type_list = [
-                    0 if t < isat7L_grad_max_time - 0.2
-                    else 1 if t < isat7L_grad_max_time - 0.1
-                    else 0 if t < detach_start_time - 0.05
-                    else -1 if t < detach_start_time + 0.05
-                    else 0
-                    for t in self.time_list
-                ]
-            else:
-                type_list = [
-                    0 if t < isat7L_grad_max_time - 0.2
-                    else 1 if t < isat7L_grad_max_time - 0.1
-                    else 0 if t < isat7L_grad_max_time + 0.1
-                    else -1 if t < isat7L_grad_max_time + 0.2
-                    else 0
-                    for t in self.time_list
-                ]
+                if detach_start_time + 0.05 > isat7L_grad_max_time + 0.2:
+                    type_list = [
+                        0 if t < isat7L_grad_max_time - 0.2
+                        else 1 if t < isat7L_grad_max_time - 0.1
+                        else 0 if t < detach_start_time - 0.05
+                        else -1 if t < detach_start_time + 0.05
+                        else 0
+                        for t in self.time_list
+                    ]
+                else:
+                    type_list = [
+                        0 if t < isat7L_grad_max_time - 0.2
+                        else 1 if t < isat7L_grad_max_time - 0.1
+                        else 0 if t < isat7L_grad_max_time + 0.1
+                        else -1 if t < isat7L_grad_max_time + 0.2
+                        else 0
+                        for t in self.time_list
+                    ]
 
-        self.type_list = type_list
-        return 1
+            self.type_list = type_list
+            return 1
+
+        except Exception as e:
+            print(f"Error occurred: {e}")
+            return 0
 
     def pinput(self,new=False):
         if new:
@@ -356,9 +344,9 @@ class DetachData(CalcMPEXP):
             if rmp_lid_list[i] == 0:
                 rmp_lid_list[i] = 1
         rmp_lid_list = rmp_lid_list[rmp_no_list==shotNO]
-        print(rmp_lid_list)
-        print(rmp_lid_list)
-        print(rmp_lid_list)
+        # print(rmp_lid_list)
+        # print(rmp_lid_list)
+        # print(rmp_lid_list)
         self.rmp_lid = [rmp_lid_list[0]]*len(self.time_list)
         self.rmp_lid = [n/abs(self.Bt) for n in self.rmp_lid]
         return 1
