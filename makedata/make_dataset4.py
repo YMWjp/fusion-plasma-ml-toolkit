@@ -1530,15 +1530,46 @@ class CalcMPEXP(GetFiles):
         #ax5_2.legend()
         '''
 
-        self.time_list1 = self.time_list[self.Isat_7L>0]
-        self.time_list2 = self.time_list[self.Isat_4R>0]
-        self.Isat_7L1 = self.Isat_7L[self.Isat_7L>0]
-        self.Isat_4R2 = self.Isat_4R[self.Isat_4R>0]
+        # labels = ['2L', '2R', '4L', '4R', '6L', '6R', '7L', '7R', '8L', '8R', '9L', '9R', '10L', '10R']
 
-        # Isatで使用するもの
-        axes[5].plot(self.time_list, self.Isat_6L)
-        axes[5].plot(self.time_list2, self.Isat_4R2)
-        axes[5].set_ylabel(r'$Isat_{7L}$[A]',fontsize=14)
+        # for label in labels:
+        #     attr_name = f'Isat_{label}'
+        #     time_list_attr = f'time_list{label}'
+        #     filtered_attr = f'{attr_name}1'
+
+        #     setattr(self, time_list_attr, self.time_list[getattr(self, attr_name) > 0])
+        #     setattr(self, filtered_attr, getattr(self, attr_name)[getattr(self, attr_name) > 0])
+        
+        # axes[0].plot(self.time_list2L, self.Isat_2L1, label='Isat_2L')
+        # axes[0].plot(self.time_list2R, self.Isat_2R1, label='Isat_2R')
+        # axes[0].set_ylabel(r'$Isat_{2}$[A]',fontsize=13)
+
+        # axes[1].plot(self.time_list4L, self.Isat_4L1, label='Isat_4L')
+        # axes[1].plot(self.time_list4R, self.Isat_4R1, label='Isat_4R')
+        # axes[1].set_ylabel(r'$Isat_{4}$[A]',fontsize=13)
+
+        # axes[2].plot(self.time_list6L, self.Isat_6L1, label='Isat_6L')
+        # axes[2].plot(self.time_list6R, self.Isat_6R1, label='Isat_6R')
+        # axes[2].set_ylabel(r'$Isat_{6}$[A]',fontsize=13)
+
+        # axes[3].plot(self.time_list7L, self.Isat_7L1, label='Isat_7L')
+        # axes[3].plot(self.time_list7R, self.Isat_7R1, label='Isat_7R')
+        # axes[3].set_ylabel(r'$Isat_{7}$[A]',fontsize=13)
+
+        # axes[4].plot(self.time_list8L, self.Isat_8L1, label='Isat_8L')
+        # axes[4].plot(self.time_list8R, self.Isat_8R1, label='Isat_8R')
+        # axes[4].set_ylabel(r'$Isat_{8}$[A]',fontsize=13)
+
+        self.time_list7L = self.time_list[self.Isat_7L>0]
+        self.Isat_7L1 = self.Isat_7L[self.Isat_7L>0]
+        axes[5].plot(self.time_list7L, self.Isat_7L1, label='Isat_7L')
+        axes[5].set_ylabel(r'$Isat_{7}$[A]',fontsize=13)
+
+        # axes[6].plot(self.time_list10L, self.Isat_10L1, label='Isat_10L')
+        # axes[6].plot(self.time_list10R, self.Isat_10R1, label='Isat_10R')
+        # axes[6].set_ylabel(r'$Isat_{10}$[A]',fontsize=13)
+        # for i in range(7):
+        #     axes[i].legend(loc='upper right',fontsize=12)
 
         axes[6].plot(self.time_list, self.type_list)
         axes[6].set_ylabel(r'type',fontsize=14)
