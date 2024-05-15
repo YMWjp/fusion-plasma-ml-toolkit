@@ -1,5 +1,5 @@
 #1パラメータ分離させた領域図_rap影響評価に使用
-import common
+
 import numpy as np
 import matplotlib.pyplot as plt
 from numpy.core.function_base import linspace
@@ -7,7 +7,7 @@ from numpy.core.function_base import linspace
 date = '20240515'
 datapath = './results/'+date+'/dataset.csv'
 datapath2 = './results/'+date+'/label.csv'
-datapath3 = './results/'+date+'/result7.tsv'
+datapath3 = './results/'+date+'/result5.tsv'
 datapath4 = './results/'+date+'/parameter.csv'
 datapath5 = './results/'+date+'/dataset_minmax.csv'
 
@@ -86,6 +86,7 @@ axes4 = plt.subplot()
 # axes[1] = fig.add_subplot2grid((2,3),(0,1))
 # plt = fig.add_subplot2grid((2,3),(0,2))
 # axes[3] = fig.add_subplot2grid((2,3),(1,0),colspan=2)
+# print(axes)
 
 '''
 
@@ -119,24 +120,24 @@ np.where(results_header == 'F1score')[0][0]
 #カエルのここ
 # 使いたいものの列番号から1を引いた値
 shotdata_f1max = svm_result_data[792]
-target_number = 3
-
 weight_before = [float(s) for s in shotdata_f1max[1:len(use_parameter_list)+1]]
-# weight_afterの計算でゼロ除算を避けるためのチェックを追加
-epsilon = 1e-10  # 小さな値を追加してゼロ除算を避ける
-weight_after = weight_before / (minmax_data[0] - minmax_data[1] + epsilon)
+# print(shotdata_f1max)
+weight_after = weight_before/(minmax_data[0]-minmax_data[1])
 bias_after = float(shotdata_f1max[len(use_parameter_list)+1])
 for i in range(len(use_parameter_list)):
     bias_after = bias_after - weight_after[i]*minmax_data[1,i]
 
 def func_func(datain_shot=[]):
     #まずwとbの補正
+    # print(type(weight_before),type(minmax_data[0]),type(minmax_data[1]))
+    # print(minmax_data[0]-minmax_data[1])
     f = 1
     datain_shot_row  = np.zeros(len(use_parameter_list))
     for i in range(len(use_parameter_list)):
         datain_shot_row[i] = np.e**(datain_shot[i]*(minmax_data[0,i]-minmax_data[1,i])+minmax_data[1,i])
         f = f * datain_shot_row[i]**weight_after[i]
     f = f * np.e ** bias_after
+    # print(datain_shot_row)
     return f
 
 func_func_list = np.zeros(len(data))
@@ -144,11 +145,16 @@ func_func_list = np.zeros(len(data))
 for i in range(len(data)):
     func_func_list[i] = func_func(datain_shot=data[i])
 
+# print(len(func_func_list))
+# print('funcのminmax[',np.min(func_func_list),np.max(func_func_list))
+# print(func_func_list)
 
 func_func_list1 = func_func_list[label==1]
 func_func_list2 = func_func_list[label==-1]
+# print(len(func_func_list1))
 
 x0lim_log = [np.log10(np.min(func_func_list))-(np.log10(np.max(func_func_list))+np.log10(np.min(func_func_list)))/10,np.log10(np.max(func_func_list))+(np.log10(np.max(func_func_list))+np.log10(np.min(func_func_list)))/10]
+# print(x0lim_log)
 
 
 
@@ -160,20 +166,26 @@ def func_func1(n,datain_shot=[]):
     max_data = minmax_data[0]
     min_data = np.delete(min_data,n)
     max_data = np.delete(max_data,n)
+    # print(list)
+    # print(shotdata_f1max)
     weight_after2 = np.delete(weight_after,n)
     weight_after2 = weight_after2*-1/weight_after[n]
     datain_shot_row  = np.zeros(len(use_parameter_list)-1)
     for i in range(len(use_parameter_list)-1):
+        # print(type(list[i]))
+        # print(shotdata_f1max[i+1])
         datain_shot_row[i] = np.e**(datain_shot2[i]*(max_data[i]-min_data[i])+min_data[i])
         f = f * datain_shot_row[i]**weight_after2[i]
     f = f * np.e ** (bias_after*-1/weight_after[n])
     return f
 
+target_number = 14
 func_func1_list = np.zeros(len(data))
 for i in range(len(data)):
     func_func1_list[i] = func_func1(target_number,datain_shot=data[i])
 func_func1_list1 = func_func1_list[label==1]
 func_func1_list2 = func_func1_list[label==-1]
+# print(te_edge)
 target_parameter_list = data[:,target_number]
 target_parameter_row_list = np.e**(target_parameter_list*(minmax_data[0,target_number]-minmax_data[1,target_number])+minmax_data[1,target_number])
 target_parameter_list1 = target_parameter_row_list[label==1]
@@ -186,23 +198,13 @@ target_parameter_list2 = target_parameter_row_list[label==-1]
 
 
 # y2lim = [0.0001,0.001]
-y2lim = [0.1,0.5]
+y2lim = [0.1,2000]
 # y2lim = [0.001,7]
+# print(y2lim)
 y2lim_space = linspace(y2lim[0],y2lim[1],10000)
 x_forfig2 = y2lim_space
 # print(len(func_func1_list))
 # print(len(target_parameter_list))
-
-print("func_func1_list1:", func_func1_list1)
-print("target_parameter_list1:", target_parameter_list1)
-print("func_func1_list2:", func_func1_list2)
-print("target_parameter_list2:", target_parameter_list2)
-
-# プロットする点の数を表示
-print("Number of points in func_func1_list1:", len(func_func1_list1))
-print("Number of points in target_parameter_list1:", len(target_parameter_list1))
-print("Number of points in func_func1_list2:", len(func_func1_list2))
-print("Number of points in target_parameter_list2:", len(target_parameter_list2))
 
 axes4.plot(func_func1_list1,target_parameter_list1,'.',color='blue',label='detach')
 axes4.plot(func_func1_list2,target_parameter_list2,'.',color='red',label='attach')
@@ -211,26 +213,25 @@ axes4.legend(labelcolor='linecolor',markerscale=3)
 # plt.ylim(np.min(target_parameter_row_list),np.max(target_parameter_row_list))
 axes4.set_xscale("log")
 
+# print('func1のminmax[',np.min(func_func1_list),np.max(func_func1_list))
+# print('targetparameterのminmax[',np.min(target_parameter_row_list),np.max(target_parameter_row_list))
 
 
 # plt.ylim(y2lim[0],y2lim[1])
 
 # axes4.set_ylabel(use_parameter_list[target_number])
 # axes4.set_ylabel('$\Delta\Phi_{eff}$')
-axes4.set_ylabel('$P_\mathrm{rad}/P_\mathrm{input}$')
+axes4.set_ylabel('$Ne$')
 # axes4.set_ylabel('RMP_LID[A]')
 func_parameter_list = shotdata_f1max[0].split(',')
-print("func_parameter_list:", func_parameter_list)
 func_parameter_list_int = [int(s) for s in func_parameter_list]
+print(func_parameter_list_int)
+print(bias_after)
 for i in func_parameter_list_int:
     print(weight_after[i])
 func_parameter_list_int.remove(target_number)
-print("func_parameter_list_int:", func_parameter_list_int)
-print("Contents of datapath4 (parameter.csv):")
-with open(datapath4, 'r') as f:
-    for line in f:
-        print(line.strip())
 xlavel = '${e}^{%s}$' % str(round(bias_after*-1/weight_after[target_number],3))
+# print(func_parameter_list_int)
 for i in func_parameter_list_int:
     if i == 6 or i == 8:
         xlavel = xlavel + r'$\mathrm{%s}^{%s}$' % (use_parameter_list[i],round(weight_after[i]*-1/weight_after[target_number],3))
