@@ -18,18 +18,18 @@ import glob
 import numpy as np
 from scipy import interpolate, signal
 import matplotlib.pyplot as plt
-
+import pdb
 
 import datetime
 
 # from ..Kaiseki import egdb_class as egdb
 # sys.path.append(os.path.join(os.path.dirname(__file__), '../Kaiseki'))
-from egdb_class import *
+from egdb_class import egdb2d
 # sys.path.append(os.path.join(os.path.dirname(__file__), '../PyLHD'))
-from igetfile import *
+from igetfile import igetfile
 
 # sys.path.append(os.path.join(os.path.dirname(__file__), './tsmap_calib'))
-from read_tsmap_calib import *
+from read_tsmap_calib import TsmapCalib, EceSlow
 
 class ISS04():
     def __init__(self,R):
@@ -113,7 +113,7 @@ class GetFiles(object):
                     print('shot:{0} diag:{1} is not exist'.format(self.shotNO, diag))
                     self.missing_list.append(diag)
                     isfile = -1
-            except:
+            except ValueError:
                 print('Bad Zip File ERROR')
                 return 2
         return isfile
@@ -396,7 +396,7 @@ class CalcMPEXP(GetFiles):
         # Pin_sm = signal.savgol_filter(Pin, 21, 3)
         ISS = ISS04(R=self.Rax)
         # nel_thomsonでISSを計算するように変更
-        tau = ISS.calc_tau(B=self.Bt,nel=self.nel_thomson/self.ne_length,P=Pin)
+        # tau = ISS.calc_tau(B=self.Bt,nel=self.nel_thomson/self.ne_length,P=Pin)
         tau_sm = ISS.calc_tau(B=self.Bt,nel=self.nel_thomson/self.ne_length,P=Pin_sm)
         
         # import pdb; pdb.set_trace()
@@ -407,7 +407,7 @@ class CalcMPEXP(GetFiles):
         Wp_iss = tau_sm*Pin_sm #0402 スムージング
         Wp_iss[Pin_sm==0] = 0
         # 0403 nan を補間するように
-        f_iss = interpolate.interp1d(self.time_list[~np.isnan(Wp_iss)],Wp_iss[~np.isnan(Wp_iss)],'previous',bounds_error=False, fill_value='extrapolate')
+        # f_iss = interpolate.interp1d(self.time_list[~np.isnan(Wp_iss)],Wp_iss[~np.isnan(Wp_iss)],'previous',bounds_error=False, fill_value='extrapolate')
         # self.Wp_iss = f_iss(self.time_list)
         self.Wp_iss = Wp_iss
         self.Wp_iss_sm = tau_sm*Pin_sm
@@ -470,7 +470,7 @@ class CalcMPEXP(GetFiles):
         time_list = np.array(eg.dimdata[1:])
         thomson = np.array(eg.data[eg.valname2idx('nl_thomson_3669')][1:])
         fir = np.array(eg.data[eg.valname2idx('nl_fir_3669')][1:])
-        import pdb; pdb.set_trace()
+        pdb.set_trace()
         factor_arg = np.logical_and(time_list>3.5, time_list<4)
         factor = np.max(fir[factor_arg])/np.max(thomson[factor_arg])
         delta_t = np.convolve(time_list, [0,0,1,0,0], mode='valid')
@@ -615,7 +615,7 @@ class CalcMPEXP(GetFiles):
         total_list = np.array(eg_ech.data[eg_ech.valname2idx('Total ECH')][1:])
         # import pdb; pdb.set_trace()
         f1_total = interpolate.interp1d(ech_time_list, total_list,bounds_error=False,fill_value=0)
-        ech_on_off = (f1_total(self.time_list)>0).astype(float)
+        # ech_on_off = (f1_total(self.time_list)>0).astype(float)
         self.ech = f1_total(self.time_list)
         return 1
         # if ~os.path.exists("./LHDGAUSS_DEPROF@"+str(self.shotNO)+".dat"):
@@ -748,8 +748,7 @@ class CalcMPEXP(GetFiles):
         eg = EceSlow("./ece_slow@"+str(self.shotNO)+".dat")
         for i in range(len(self.ece_ch)):
             self.ece_list[i] = eg.get_te(self.ece_ch[i], self.time_list)
-        # import pdb; pdb.set_trace()
-        if np.all([np.all(l==0) for l in self.ece_list]):
+        if np.all([np.all(line==0) for line in self.ece_list]):
             return -1
         
         # import pdb; pdb.set_trace()
@@ -854,11 +853,11 @@ class CalcMPEXP(GetFiles):
         # nel_smooth = signal.savgol_filter(self.nel, 101, 3)
         prad_smooth = np.convolve(self.prad, np.ones(9)/9, mode='same')
         # nel_smooth = np.convolve(self.nel, np.ones(9)/9, mode='same')
-        nel_smooth = np.convolve(self.nel_thomson, np.ones(9)/9, mode='same')
-        nel_grad = np.gradient(nel_smooth,self.time_list)
+        # nel_smooth = np.convolve(self.nel_thomson, np.ones(9)/9, mode='same')
+        # nel_grad = np.gradient(nel_smooth,self.time_list)
         # nel_grad = np.gradient(self.nel_thomson,self.time_list)
         # nel_grad_smooth = signal.savgol_filter(nel_grad, 101, 3)
-        nel_grad_smooth = np.convolve(nel_grad, np.ones(9)/9, mode='same')
+        # nel_grad_smooth = np.convolve(nel_grad, np.ones(9)/9, mode='same')
         # 2021/01/15 修正
         # nel_grad_smooth = np.convolve(nel_smooth, np.ones(9)/9, mode='same')
         # plt.plot(self.time_list,np.convolve(np.gradient(np.convolve(self.nel_thomson, np.ones(9)/9, mode='same'),self.time_list),np.ones(9)/9, mode='same'))
@@ -907,7 +906,7 @@ class CalcMPEXP(GetFiles):
         exp_conv = np.convolve(self.MPexp, np.ones(9)/9,mode='same')
         self.exp_conv = exp_conv
 
-        remarks = self.remark
+        # remarks = self.remark
         about = self.about
 
         if self.type == 1:
@@ -941,7 +940,7 @@ class CalcMPEXP(GetFiles):
         # exp_conv = self.MPexp
         self.exp_conv = exp_conv
 
-        remarks = self.remark
+        # remarks = self.remark
         about = self.about
 
         if self.type == 1:
@@ -991,7 +990,7 @@ class CalcMPEXP(GetFiles):
             # axes = [fig.add_subplot(5,1,i+1) for i in range(5)]
 
             plt.rcParams['lines.linewidth'] = 2
-            cmap = plt.get_cmap("tab10")
+            # cmap = plt.get_cmap("tab10")
             color_l = '#0079C4'
             color_r = '#E00059'
 
@@ -1091,7 +1090,7 @@ class CalcMPEXP(GetFiles):
         # axes = [fig.add_subplot(5,1,i+1) for i in range(5)]
 
         plt.rcParams['lines.linewidth'] = 2
-        cmap = plt.get_cmap("tab10")
+        # cmap = plt.get_cmap("tab10")
         color_l = '#0079C4'
         color_r = '#E00059'
 
@@ -1188,7 +1187,7 @@ class CalcMPEXP(GetFiles):
         axes = [fig.add_subplot(5,1,i+1) for i in range(5)]
 
         plt.rcParams['lines.linewidth'] = 2
-        cmap = plt.get_cmap("tab10")
+        # cmap = plt.get_cmap("tab10")
         color_l = '#0079C4'
         color_r = '#E00059'
 
@@ -1269,7 +1268,7 @@ class CalcMPEXP(GetFiles):
         axes = [fig.add_subplot(5,1,i+1) for i in range(5)]
 
         plt.rcParams['lines.linewidth'] = 2
-        cmap = plt.get_cmap("tab10")
+        # cmap = plt.get_cmap("tab10")
         color_l = '#0079C4'
         color_r = '#E00059'
 
@@ -1350,7 +1349,7 @@ class CalcMPEXP(GetFiles):
         axes = [fig.add_subplot(4,1,i+1) for i in range(4)]
 
         plt.rcParams['lines.linewidth'] = 2
-        cmap = plt.get_cmap("tab10")
+        # cmap = plt.get_cmap("tab10")
         color_l = '#0079C4'
         color_r = '#E00059'
 
@@ -1419,7 +1418,7 @@ class CalcMPEXP(GetFiles):
         ax = fig.add_subplot(1,1,1)
 
         plt.rcParams['lines.linewidth'] = 2
-        cmap = plt.get_cmap("tab10")
+        # cmap = plt.get_cmap("tab10")
         color_l = '#0079C4'
         color_r = '#E00059'
 
@@ -1461,8 +1460,8 @@ class CalcMPEXP(GetFiles):
 
     def plot_labels(self,save=0):
         remarks = self.remark
-        about = self.about
-        exp_conv = self.exp_conv
+        # about = self.about
+        # exp_conv = self.exp_conv
         fig = plt.figure(figsize=(10,12))
         axes = [fig.add_subplot(13,1,i+1) for i in range(13)]
 
@@ -1954,7 +1953,7 @@ if __name__ == '__main__':
         # graph(args[1],'labels.csv')
     else:
         # Usage:
-        main_labels(dataset_name,label_csv_name)
+        main_labels('dataset_20240229.csv','labels_20240229.csv')
         # main_labels('dataset_210113.csv','labels_210113.csv')
         # main_labels('dataset_191114.csv','labels_191114.csv')
         # main_labels('dataset.csv','labels.csv')

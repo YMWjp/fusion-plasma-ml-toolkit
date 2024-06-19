@@ -71,7 +71,7 @@ def unzip(targetfile):
             fpo.write(data)
             fpo.close()
             flist.append(target)
-        except:
+        except ValueError:
             data = None
     zf.close()
     os.remove(targetfile)
@@ -105,7 +105,7 @@ def igetfile(diagname, shotno, subshot, outputname):
     subfolder = '%06d' % subshot
     targetfolderpath = targetfolderpath + subfolder
     #print targetfolderpath
-    filelist = ftpList(targetfolderpath)
+    # filelist = ftpList(targetfolderpath)
     ftpGetFromHttp(shotno, diagname, subshot, outputname)
     # if 0 == len(filelist):
     #     return None
@@ -144,11 +144,11 @@ if __name__ == '__main__':
     output = options.output
     try:
         sn = int(shotno)
-    except:
+    except ValueError:
         exit(-1)
     try:
         sub = int(subshotno)
-    except:
+    except ValueError:
         exit(-1)
     if not diagname:
         exit(-1)
@@ -156,7 +156,7 @@ if __name__ == '__main__':
         exit(-1)
 
     ret = igetfile(diagname, sn, sub, output)
-    if ret == None:
+    if ret is None:
         print('Error: there is no data for the shot.')
         exit(-1)
     exit(0)

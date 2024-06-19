@@ -6,16 +6,16 @@ from getfile_http_2024 import getdata
 import numpy as np
 from get_params.get_Isat import get_Isat
 from get_params.get_nbi import get_nbi
-from get_params.get_SDLloop import get_SDLloop
-from get_params.get_beta_e import get_beta_e
-from get_params.get_soxmos import get_soxmos
-from get_params.get_beta0 import get_beta0
-from get_params.get_fig import get_fig
-from get_params.get_col import get_col
-from get_params.get_rmp_lid import get_rmp_lid
+# from get_params.get_SDLloop import get_SDLloop
+# from get_params.get_beta_e import get_beta_e
+# from get_params.get_soxmos import get_soxmos
+# from get_params.get_beta0 import get_beta0
+# from get_params.get_fig import get_fig
+# from get_params.get_col import get_col
+# from get_params.get_rmp_lid import get_rmp_lid
 
 # _6 だらだら下がるやつ排除
-
+from egdb_class import egdb2d
 from make_dataset4 import CalcMPEXP
 
 class DetachData(CalcMPEXP):
@@ -153,8 +153,8 @@ class DetachData(CalcMPEXP):
             wp_time, wp_data = get_egdata(shotNO, "wp", "Wp")
             wp_grad = np.gradient(wp_data)
             wp_min_time = wp_time[np.argmin(wp_grad)]
-            wp_time_0 = wp_time[wp_data > 50]
-            wp_max_time = wp_time_0[0]
+            # wp_time_0 = wp_time[wp_data > 50]
+            # wp_max_time = wp_time_0[0]
 
             # isat7L データの移動平均と勾配の計算
             isat7L_time = self.time_list
