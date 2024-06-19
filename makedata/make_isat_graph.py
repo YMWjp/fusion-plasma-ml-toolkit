@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from make_dataset4 import eg_read
+from classes.eg_read import eg_read
 import requests
 import os
 

@@ -1,6 +1,6 @@
 import os
 import numpy as np
-from make_dataset4 import eg_read
+from classes.eg_read import eg_read
 
 
 def get_Isat(self):  # 上書き
@@ -31,7 +31,7 @@ def get_Isat(self):  # 上書き
                     "Isat_" + nL,
                     eg.eg_f1("Iis_" + nL + "@" + str(gdn_info[i]), self.time_list),
                 )
-            except:
+            except ValueError:
                 pass
         # Isat_7Lの外れ値をなくし整形する
         # まず、0.0001以下の場合はひとつ飛ばした前後の値の平均を代入する

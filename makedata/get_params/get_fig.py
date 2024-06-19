@@ -1,4 +1,4 @@
-from make_dataset4 import eg_read
+from classes.eg_read import eg_read
 
 
 def get_fig(self, shotNO):

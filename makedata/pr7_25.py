@@ -16,7 +16,7 @@ from get_params.get_nbi import get_nbi
 
 # _6 だらだら下がるやつ排除
 from egdb_class import egdb2d
-from make_dataset4 import CalcMPEXP
+from classes.CalcMPEXP import CalcMPEXP
 
 class DetachData(CalcMPEXP):
     """DetachData クラスの説明

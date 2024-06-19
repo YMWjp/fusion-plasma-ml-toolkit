@@ -1,5 +1,5 @@
 import numpy as np
-from make_dataset4 import eg_read
+from classes.eg_read import eg_read
 
 def get_nbi(self):
         nb_tmp = np.zeros_like(self.time_list)
