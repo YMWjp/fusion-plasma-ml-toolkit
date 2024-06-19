@@ -1,10 +1,10 @@
 #1パラメータ分離させた領域図_rap影響評価に使用
-import common
+from common import names_dict
 import numpy as np
 import matplotlib.pyplot as plt
 from numpy.core.function_base import linspace
 
-date = '20240515'
+date = '20240522'
 datapath = './results/'+date+'/dataset.csv'
 datapath2 = './results/'+date+'/label.csv'
 datapath3 = './results/'+date+'/result7.tsv'
@@ -186,71 +186,52 @@ target_parameter_list2 = target_parameter_row_list[label==-1]
 
 
 # y2lim = [0.0001,0.001]
-y2lim = [0.1,0.5]
+y2lim = [0.1,0.35]
 # y2lim = [0.001,7]
 y2lim_space = linspace(y2lim[0],y2lim[1],10000)
 x_forfig2 = y2lim_space
 # print(len(func_func1_list))
 # print(len(target_parameter_list))
 
-print("func_func1_list1:", func_func1_list1)
-print("target_parameter_list1:", target_parameter_list1)
-print("func_func1_list2:", func_func1_list2)
-print("target_parameter_list2:", target_parameter_list2)
-
-# プロットする点の数を表示
-print("Number of points in func_func1_list1:", len(func_func1_list1))
-print("Number of points in target_parameter_list1:", len(target_parameter_list1))
-print("Number of points in func_func1_list2:", len(func_func1_list2))
-print("Number of points in target_parameter_list2:", len(target_parameter_list2))
-
-axes4.plot(func_func1_list1,target_parameter_list1,'.',color='blue',label='detach')
-axes4.plot(func_func1_list2,target_parameter_list2,'.',color='red',label='attach')
+axes4.plot(func_func1_list1,target_parameter_list1,'.',color='blue',label='detach', markersize=30)
+axes4.plot(func_func1_list2,target_parameter_list2,'.',color='red',label='attach', markersize=30)
 axes4.plot(x_forfig2,y2lim_space,color='black')
-axes4.legend(labelcolor='linecolor',markerscale=3)
+axes4.legend(labelcolor='linecolor',markerscale=1)
 # plt.ylim(np.min(target_parameter_row_list),np.max(target_parameter_row_list))
 axes4.set_xscale("log")
 
 
-
-# plt.ylim(y2lim[0],y2lim[1])
-
-# axes4.set_ylabel(use_parameter_list[target_number])
-# axes4.set_ylabel('$\Delta\Phi_{eff}$')
-axes4.set_ylabel('$P_\mathrm{rad}/P_\mathrm{input}$')
-# axes4.set_ylabel('RMP_LID[A]')
-func_parameter_list = shotdata_f1max[0].split(',')
-print("func_parameter_list:", func_parameter_list)
-func_parameter_list_int = [int(s) for s in func_parameter_list]
-for i in func_parameter_list_int:
-    print(weight_after[i])
-func_parameter_list_int.remove(target_number)
-print("func_parameter_list_int:", func_parameter_list_int)
-print("Contents of datapath4 (parameter.csv):")
 with open(datapath4, 'r') as f:
-    for line in f:
-        print(line.strip())
-xlavel = '${e}^{%s}$' % str(round(bias_after*-1/weight_after[target_number],3))
+    parameter_list = [line.strip() for line in f]
+axes4.set_ylabel(names_dict.get(parameter_list[target_number], parameter_list[target_number]))
+
+# Parse func_parameter_list
+func_parameter_list = shotdata_f1max[0].split(',')
+func_parameter_list_int = [int(s) for s in func_parameter_list]
+
+print(func_parameter_list_int)
+
+# Remove target_number from the list
+func_parameter_list_int.remove(target_number)
+# for i in func_parameter_list_int:
+#     param_name = names_dict.get(parameter_list[i], parameter_list[i])
+#     exponent = round(weight_after[i]*-1/weight_after[target_number], 3)
+#     xlavel += f'{param_name}^{exponent}'
+
+print(func_parameter_list_int)
+xlavel = '${e}^{%s}$' % str(round(bias_after*-1/weight_after[target_number], 3))
 for i in func_parameter_list_int:
-    if i == 6 or i == 8:
-        xlavel = xlavel + r'$\mathrm{%s}^{%s}$' % (use_parameter_list[i],round(weight_after[i]*-1/weight_after[target_number],3))
-    elif i == 0:
-        xlavel = xlavel + r'$\bar{n}_\mathrm{e}^{%s}$' % (round(weight_after[i]*-1/weight_after[target_number],3))
-    elif i == 2:
-        xlavel = xlavel + '$P_\mathrm{input}^{%s}$' % (round(weight_after[i]*-1/weight_after[target_number],3))        
-    elif i == 3:
-        xlavel = xlavel + '$P_\mathrm{rad}/P_\mathrm{input}^{%s}$' % (round(weight_after[i]*-1/weight_after[target_number],3))
-    elif i == 12:
+    print(use_parameter_list[i], i)
+    if i == 2:
+        xlavel = xlavel + r'$P_{in}^{%s}$' % (round(weight_after[i]*-1/weight_after[target_number],3))
+    elif i == 10:
         xlavel = xlavel + '$\Delta\Phi_{eff}^{%s}$' % (round(weight_after[i]*-1/weight_after[target_number],3))
-    elif i == 14:
-        xlavel = xlavel + '$Ne^{%s}$' % (round(weight_after[i]*-1/weight_after[target_number],3))
-    elif i == 15:
-        xlavel = xlavel + '$Ar^{%s}$' % (round(weight_after[i]*-1/weight_after[target_number],3))
+    elif i == 11:
+        xlavel = xlavel + '$\Delta\Theta_{eff}^{%s}$' % (round(weight_after[i]*-1/weight_after[target_number],3))
     else:
         xlavel = xlavel + '$\mathrm{%s}^{%s}$' % (use_parameter_list[i],round(weight_after[i]*-1/weight_after[target_number],3))
 
-axes4.set_xlabel(xlavel)
-'$P_\mathrm{rad}/P_\mathrm{input}$'
+axes4.set_xlabel(xlavel, fontsize=18)
 
 plt.savefig('./hist&sccaterpng/sccater_rmp_'+str(date)+'target'+str(target_number)+'.png')
 plt.show()
