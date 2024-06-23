@@ -286,7 +286,6 @@ class CalcMPEXP(GetFiles):
         # import pdb; pdb.set_trace()
         return 1
 
-
     def get_thomson(self,dt=0.01, main=True):
         eg = egdb2d("./tsmap_nel@"+str(self.shotNO)+".dat")
         eg.readFile()
@@ -503,7 +502,6 @@ class CalcMPEXP(GetFiles):
         # self.ech = f1_dep(self.time_list) * ech_on_off
         # return 1       
 
-
     def get_nbi(self):
         nb_tmp = np.zeros_like(self.time_list)
         tan_names = ['1','2','3']
@@ -559,7 +557,6 @@ class CalcMPEXP(GetFiles):
 
         return 1
 
-
     def get_Ip(self):
         eg = eg_read("./ip@"+str(self.shotNO)+".dat")
         self.Ip = eg.eg_f1('Ip', self.time_list)
@@ -583,7 +580,6 @@ class CalcMPEXP(GetFiles):
             self.FIG = np.zeros_like(self.time_list)
             self.Pcc = np.zeros_like(self.time_list)
         return 1
-
 
     def get_Isat(self):
         if os.path.isfile("./DivIis_tor_sum@"+str(self.shotNO)+".dat"):
@@ -651,7 +647,6 @@ class CalcMPEXP(GetFiles):
         # import pdb; pdb.set_trace()
         return 1
 
-
     def get_ha(self):
         eg = eg_read("./ha2@"+str(self.shotNO)+".dat")
         ha = np.zeros_like(self.time_list)
@@ -688,7 +683,6 @@ class CalcMPEXP(GetFiles):
         # import pdb; pdb.set_trace()
         return 1
 
-    
     def get_ha1(self):
         eg = eg_read("./ha1@"+str(self.shotNO)+".dat")
         self.HeI =  eg.eg_f1('HeI(Impmon)', self.time_list)
@@ -954,7 +948,6 @@ class CalcMPEXP(GetFiles):
             plt.subplots_adjust(left=0.175,right=0.8,bottom=0.08,top=0.96,hspace=0)
             #plt.show()
 
-
     def graph(self,save=0): #200408 -> 200511
         fig = plt.figure(figsize=(6.5,7))
         axes = [fig.add_subplot(5,1,i+1) for i in range(5)]
@@ -1132,7 +1125,6 @@ class CalcMPEXP(GetFiles):
 
         plt.subplots_adjust(left=0.15,right=0.85,bottom=0.08,top=0.94,hspace=0)
         #plt.show()
-
 
     def graph_ES(self,save=0):
         fig = plt.figure(figsize=(6,8))
