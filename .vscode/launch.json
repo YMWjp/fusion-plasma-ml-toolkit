@@ -10,8 +10,8 @@
       "request": "launch",
       "program": "${file}",
       "console": "integratedTerminal",
-      "justMyCode": true,
-      "cwd": "${workspaceFolder}/makedata" // ここを追加
+      "justMyCode": false,
+      "cwd": "${workspaceFolder}/makedata"
     }
   ]
 }
