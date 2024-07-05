@@ -1,4 +1,5 @@
 import datetime
+import json
 
 # from getfile_dat import getfile_dat
 from getfile_http_2024 import getdata
@@ -272,59 +273,105 @@ class DetachData(CalcMPEXP):
             pinput = np.ones_like(self.time_list)
         return self.prad / pinput
 
-    def make_dataset(self, header):  # 修正して使うこと
-        # import pdb; pdb.set_trace()
-        self.output_dict = {
-            "shotNO": np.ones_like(self.time_list) * self.shotNO,
-            "times": self.time_list,
-            "types": self.type_list,  #'labels':self.label,
-            "nel": self.nel / self.ne_length,
-            "B": np.ones_like(self.time_list) * np.abs(self.Bt),
-            "Pech": self.ech,
-            "Pnbi-tan": self.nbi_tan,
-            "Pnbi-perp": self.nbi_perp,
-            "Pinput": self.pinput(),
-            "PinputNEW": self.pinput(new=True),
-            "Prad": self.prad,
-            "Prad/Pinput": self.norm_prad(),
-            "Wp": self.wpdia,
-            "beta": self.beta,
-            "Rax": self.geom_center,
-            "rax_vmec": self.rax_vmec,
-            "a99": self.a99,  #'delta_sh':self.sh_shift,
-            "D/(H+D)": self.dh,
-            "CIII": self.CIII / (self.nel / self.ne_length),
-            "CIV": self.CIV / (self.nel / self.ne_length),
-            "OV": self.OV / (self.nel / self.ne_length),
-            "OVI": self.OVI / (self.nel / self.ne_length),
-            "FeXVI": self.FeXVI / (self.nel / self.ne_length),
-            "Ip": self.Ip,
-            # 'FIG':self.FIG,
-            # 'Pcc':self.Pcc,
-            "Isat@4R": self.Isat_4R,
-            "Isat@6L": self.Isat_6L,
-            "Isat@7L": self.Isat_7L,
-            "reff@100eV": self.reff100eV,
-            "ne@100eV": self.ne100eV,
-            "dVdreff@100eV": self.dV100eV,
-            "Te@center": self.Te_center,
-            "Te@edge": self.Te_edge,
-            "ne@center": self.ne_center,
-            # 'RMP_LID':self.rmp_lid,
-            # 'SDLloop_dPhi':self.SDLloop_dphi,
-            # 'SDLloop_dPhi_ext':self.SDLloop_dphi_ext,
-            # 'SDLloop_dTheta':self.SDLloop_dtheta,
-            # 'beta_e':self.beta_e,
-            # 'collision':self.col,
-            # 'beta0':self.beta0,
-            # 'fig6I':self.fig6I,
-            # 'pcc3O':self.pcc3O,
-            # 'fig/pcc':self.figpcc,
-            # 'ne_soxmos':self.ne_soxmos,
-            # 'ar_soxmos':self.ar_soxmos
-        }
-        # import pdb;pdb.set_trace()
-        # return super().make_dataset() #修正するときに消す行
+    def make_dataset(self, header):
+        self.output_dict = {}
+        if "shotNO" in header:
+            self.output_dict["shotNO"] = np.ones_like(self.time_list) * self.shotNO
+        if "times" in header:
+            self.output_dict["times"] = self.time_list
+        if "types" in header:
+            self.output_dict["types"] = self.type_list
+        if "nel" in header:
+            self.output_dict["nel"] = self.nel / self.ne_length
+        if "B" in header:
+            self.output_dict["B"] = np.ones_like(self.time_list) * np.abs(self.Bt)
+        if "Pech" in header:
+            self.output_dict["Pech"] = self.ech
+        if "Pnbi-tan" in header:
+            self.output_dict["Pnbi-tan"] = self.nbi_tan
+        if "Pnbi-perp" in header:
+            self.output_dict["Pnbi-perp"] = self.nbi_perp
+        if "Pinput" in header:
+            self.output_dict["Pinput"] = self.pinput()
+        if "PinputNEW" in header:
+            self.output_dict["PinputNEW"] = self.pinput(new=True)
+        if "Prad" in header:
+            self.output_dict["Prad"] = self.prad
+        if "Prad/Pinput" in header:
+            self.output_dict["Prad/Pinput"] = self.norm_prad()
+        if "Wp" in header:
+            self.output_dict["Wp"] = self.wpdia
+        if "beta" in header:
+            self.output_dict["beta"] = self.beta
+        if "Rax" in header:
+            self.output_dict["Rax"] = self.geom_center
+        if "rax_vmec" in header:
+            self.output_dict["rax_vmec"] = self.rax_vmec
+        if "a99" in header:
+            self.output_dict["a99"] = self.a99
+        if "delta_sh" in header:
+            self.output_dict["delta_sh"] = self.sh_shift
+        if "D/(H+D)" in header:
+            self.output_dict["D/(H+D)"] = self.dh
+        if "CIII" in header:
+            self.output_dict["CIII"] = self.CIII / (self.nel / self.ne_length)
+        if "CIV" in header:
+            self.output_dict["CIV"] = self.CIV / (self.nel / self.ne_length)
+        if "OV" in header:
+            self.output_dict["OV"] = self.OV / (self.nel / self.ne_length)
+        if "OVI" in header:
+            self.output_dict["OVI"] = self.OVI / (self.nel / self.ne_length)
+        if "FeXVI" in header:
+            self.output_dict["FeXVI"] = self.FeXVI / (self.nel / self.ne_length)
+        if "Ip" in header:
+            self.output_dict["Ip"] = self.Ip
+        if "FIG" in header:
+            self.output_dict["FIG"] = self.FIG
+        if "Pcc" in header:
+            self.output_dict["Pcc"] = self.Pcc
+        if "Isat@4R" in header:
+            self.output_dict["Isat@4R"] = self.Isat_4R
+        if "Isat@6L" in header:
+            self.output_dict["Isat@6L"] = self.Isat_6L
+        if "Isat@7L" in header:
+            self.output_dict["Isat@7L"] = self.Isat_7L
+        if "reff@100eV" in header:
+            self.output_dict["reff@100eV"] = self.reff100eV
+        if "ne@100eV" in header:
+            self.output_dict["ne@100eV"] = self.ne100eV
+        if "dVdreff@100eV" in header:
+            self.output_dict["dVdreff@100eV"] = self.dV100eV
+        if "Te@center" in header:
+            self.output_dict["Te@center"] = self.Te_center
+        if "Te@edge" in header:
+            self.output_dict["Te@edge"] = self.Te_edge
+        if "ne@center" in header:
+            self.output_dict["ne@center"] = self.ne_center
+        if "RMP_LID" in header:
+            self.output_dict["RMP_LID"] = self.rmp_lid
+        if "SDLloop_dPhi" in header:
+            self.output_dict["SDLloop_dPhi"] = self.SDLloop_dphi
+        if "SDLloop_dPhi_ext" in header:
+            self.output_dict["SDLloop_dPhi_ext"] = self.SDLloop_dphi_ext
+        if "SDLloop_dTheta" in header:
+            self.output_dict["SDLloop_dTheta"] = self.SDLloop_dtheta
+        if "beta_e" in header:
+            self.output_dict["beta_e"] = self.beta_e
+        if "collision" in header:
+            self.output_dict["collision"] = self.col
+        if "beta0" in header:
+            self.output_dict["beta0"] = self.beta0
+        if "fig6I" in header:
+            self.output_dict["fig6I"] = self.fig6I
+        if "pcc3O" in header:
+            self.output_dict["pcc3O"] = self.pcc3O
+        if "fig/pcc" in header:
+            self.output_dict["fig/pcc"] = self.figpcc
+        if "ne_soxmos" in header:
+            self.output_dict["ne_soxmos"] = self.ne_soxmos
+        if "ar_soxmos" in header:
+            self.output_dict["ar_soxmos"] = self.ar_soxmos
+
         savelines = np.vstack([self.output_dict[s] for s in header]).T
 
         with open(self.savename, "a") as f_handle:
@@ -340,62 +387,24 @@ def main(savename="dataset_25_7.csv", labelname="labels.csv", ion=None):
     1放電ごとに DetachData インスタンスを作り，
     CSVファイルに書き込んでいく
     """
+
+    with open("config.json", "r") as config_file:
+        config = json.load(config_file)
+
     shotNOs = np.genfromtxt(
         labelname, delimiter=",", skip_header=1, usecols=0, dtype=int
     )
-    # 以下，必要な事前ラベルを格納する
-    # types = np.genfromtxt(labelname,delimiter=',',skip_header=1,usecols=1, dtype=str)
-    # labels = np.genfromtxt(labelname,delimiter=',',skip_header=1,usecols=2, dtype=int)
-    # remarks = np.genfromtxt(labelname,delimiter=',',skip_header=1,usecols=3, dtype=str)
-    # about = np.genfromtxt(labelname,delimiter=',',skip_header=1, usecols=4,  dtype=float)
+    # 必要な事前ラベルを格納する
+    if config["use_types"]:
+        types = np.genfromtxt(labelname, delimiter=',', skip_header=1, usecols=1, dtype=str)
+    if config["use_remarks"]:
+        remarks = np.genfromtxt(labelname, delimiter=',', skip_header=1, usecols=3, dtype=str)
+    if config["use_about"]:
+        about = np.genfromtxt(labelname, delimiter=',', skip_header=1, usecols=4, dtype=float)
 
     print(shotNOs)
-    # データを保存するファイル（CSV）を用意する
-    #  labels は，放電のラベル（なければ削除のこと）
-    #  types は，データ自体のラベル
     with open(savename, "w") as f_handle:
-        header = [
-            "shotNO",
-            "times",
-            "types",
-            "nel",
-            "B",
-            "Pech",
-            "Pnbi-tan",
-            "Pnbi-perp",
-            "Pinput",
-            "Prad",
-            "Prad/Pinput",
-            "Wp",
-            "beta",
-            "Rax",
-            "rax_vmec",
-            "a99",  #'delta_sh',
-            "D/(H+D)",
-            "CIII",
-            "CIV",
-            "OV",
-            "OVI",
-            "FeXVI",
-            "Ip",
-            # 'FIG',
-            # 'Pcc',
-            "Isat@4R",
-            "Isat@6L",
-            "Isat@7L",
-            "reff@100eV",
-            "ne@100eV",
-            "dVdreff@100eV",
-            "Te@center",
-            "Te@edge",
-            "ne@center",  #'ne_peak'
-            # 'RMP_LID',
-            # 現在使用できない
-            # 'SDLloop_dPhi','SDLloop_dPhi_ext','SDLloop_dTheta',
-            # 'beta_e','collision','beta0'
-            # ,'fig6I','pcc3O','fig/pcc'
-            # 'ne_soxmos','ar_soxmos'
-        ]
+        header = config["header"]
         f_handle.write(", ".join(header) + "\n")
 
     # エラー記録
@@ -406,7 +415,9 @@ def main(savename="dataset_25_7.csv", labelname="labels.csv", ion=None):
         print(shotNO)
         nel_data = DetachData(
             shotNO,
-            # types[i], labels[i], remarks[i],about[i], #ここは使うものだけ
+            type=types[i] if config["use_types"] else "",
+            remark=remarks[i] if config["use_remarks"] else "",
+            about=about[i] if config["use_about"] else 4,
             savename=savename,
         )
         nel_data.remove_files()  # 古いegデータがあったら一旦削除

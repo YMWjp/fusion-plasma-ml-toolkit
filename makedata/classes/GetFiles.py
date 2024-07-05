@@ -21,9 +21,6 @@ class GetFiles(object):
             if os.path.isfile(outputname):
                 print(outputname, ": exist")
                 continue
-            # print(diag)
-            # print(self.shotNO.dtype)
-            # import pdb; pdb.set_trace()
             print(outputname, ": not exist")
             
         # igetfile.py版
