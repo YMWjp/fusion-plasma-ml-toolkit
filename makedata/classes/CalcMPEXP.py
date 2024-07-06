@@ -324,7 +324,7 @@ class CalcMPEXP(GetFiles):
             # import pdb; pdb.set_trace()
             self.nel_grad = np.gradient(self.nel, self.time_list)
 
-            eg = egdb2d("./firc@"+str(self.shotNO)+".dat")
+            eg = egdb2d("firc@"+str(self.shotNO)+".dat")
             eg.readFile()
             self.time_firc = np.array(eg.dimdata)
             self.nel_firc = np.array(eg.data[eg.valname2idx('nL(3669)')])
@@ -402,7 +402,7 @@ class CalcMPEXP(GetFiles):
         return 1
 
     def get_firc(self, jump=True):
-        eg = egdb2d("./firc@"+str(self.shotNO)+".dat")
+        eg = egdb2d("firc@"+str(self.shotNO)+".dat")
         eg.readFile()
         # f_jump = self.jump_correct()
         # self.time_list = np.array(eg.dimdata[1:])
@@ -442,13 +442,13 @@ class CalcMPEXP(GetFiles):
 
     def get_imp(self):
         # if os.path.isfile("./imp01@"+str(self.shotNO)+".dat"):
-        #     eg = eg_read("./imp01@"+str(self.shotNO)+".dat")
+        #     eg = eg_read("imp01@"+str(self.shotNO)+".dat")
         #     self.OV = eg.eg_f1('OV', self.time_list)
         #     self.CIII = eg.eg_f1('CIII', self.time_list)
         # else:
         #     self.OV = np.zeros_like(self.time_list)
         #     self.CIII = np.zeros_like(self.time_list)
-        eg = eg_read("./imp02@"+str(self.shotNO)+".dat")
+        eg = eg_read("imp02@"+str(self.shotNO)+".dat")
         self.OVI = eg.eg_f1('OVI', self.time_list)
         self.CIV = eg.eg_f1('CIV', self.time_list)
         # 0926 imp02 version
@@ -506,9 +506,9 @@ class CalcMPEXP(GetFiles):
         nb_tmp = np.zeros_like(self.time_list)
         tan_names = ['1','2','3']
         for s in tan_names:
-            # eg = eg_read("./nb"+s+"pwr@"+str(self.shotNO)+".dat")
+            # eg = eg_read("nb"+s+"pwr@"+str(self.shotNO)+".dat")
             # _temporalしかない放電もある．原因不明　そのためtemporalのまま
-            eg = eg_read("./nb"+s+"pwr_temporal@"+str(self.shotNO)+".dat")
+            eg = eg_read("nb"+s+"pwr_temporal@"+str(self.shotNO)+".dat")
             #pdb.set_trace()
             unit = eg.eg.valunits()[eg.eg.valname2idx('Pport-through_nb'+s)]
             if unit == 'kW':
@@ -524,7 +524,7 @@ class CalcMPEXP(GetFiles):
         nb_tmp = np.zeros_like(self.time_list)
         perp_names = ['4a','4b','5a','5b']
         for s in perp_names:
-            eg = eg_read("./nb"+s+"pwr_temporal@"+str(self.shotNO)+".dat")
+            eg = eg_read("nb"+s+"pwr_temporal@"+str(self.shotNO)+".dat")
             unit = eg.eg.valunits()[eg.eg.valname2idx('Pport-through_nb'+s)]
             if unit == 'kW':
                 nb_tmp = np.vstack((nb_tmp, eg.eg_f1('Pport-through_nb'+s, self.time_list)/1000))
@@ -558,13 +558,13 @@ class CalcMPEXP(GetFiles):
         return 1
 
     def get_Ip(self):
-        eg = eg_read("./ip@"+str(self.shotNO)+".dat")
+        eg = eg_read("ip@"+str(self.shotNO)+".dat")
         self.Ip = eg.eg_f1('Ip', self.time_list)
 
         return 1
 
     def get_wp(self):
-        eg = eg_read("./wp@"+str(self.shotNO)+".dat")
+        eg = eg_read("wp@"+str(self.shotNO)+".dat")
         self.wpdia = eg.eg_f1('Wp', self.time_list)/1000
         #wp は egfileではkJだがMJになおしている
         self.beta = eg.eg_f1('<beta-dia>', self.time_list)
@@ -572,8 +572,8 @@ class CalcMPEXP(GetFiles):
         return 1
 
     def get_Pzero(self):
-        if os.path.isfile("./fig_h2@"+str(self.shotNO)+".dat"):
-            eg = eg_read("./fig_h2@"+str(self.shotNO)+".dat")
+        if os.path.isfile("../egdata/fig_h2@"+str(self.shotNO)+".dat"):
+            eg = eg_read("fig_h2@"+str(self.shotNO)+".dat")
             self.FIG = eg.eg_f1('FIG(1.5U_W)', self.time_list)
             self.Pcc = eg.eg_f1('Pcc(10-O)', self.time_list)
         else:
@@ -582,8 +582,8 @@ class CalcMPEXP(GetFiles):
         return 1
 
     def get_Isat(self):
-        if os.path.isfile("./DivIis_tor_sum@"+str(self.shotNO)+".dat"):
-            eg = eg_read("./DivIis_tor_sum@"+str(self.shotNO)+".dat")
+        if os.path.isfile("../egdata/DivIis_tor_sum@"+str(self.shotNO)+".dat"):
+            eg = eg_read("DivIis_tor_sum@"+str(self.shotNO)+".dat")
             self.Isat = eg.eg_f1('Iis_7L@20', self.time_list)
         else:
             self.Isat = np.zeros_like(self.time_list)
@@ -648,7 +648,7 @@ class CalcMPEXP(GetFiles):
         return 1
 
     def get_ha(self):
-        eg = eg_read("./ha2@"+str(self.shotNO)+".dat")
+        eg = eg_read("ha2@"+str(self.shotNO)+".dat")
         ha = np.zeros_like(self.time_list)
         for i in range(10):
             ha_tmp = eg.eg_f1(str(i+1)+'-O(H)', self.time_list)
@@ -656,8 +656,8 @@ class CalcMPEXP(GetFiles):
         self.ha = ha
 
     def get_ha3(self):
-        if os.path.isfile("./ha3@"+str(self.shotNO)+".dat"):
-            eg = eg_read("./ha3@"+str(self.shotNO)+".dat")
+        if os.path.isfile("../egdata/ha3@"+str(self.shotNO)+".dat"):
+            eg = eg_read("ha3@"+str(self.shotNO)+".dat")
             dh = eg.eg_f1('D/(H+D)', self.time_list)
             dh[dh<0.01] = 0.01
             self.dh = dh
@@ -673,7 +673,7 @@ class CalcMPEXP(GetFiles):
         if len(self.dh) == 0:
             self.get_ha3()
         # import pdb; pdb.set_trace()
-        eg = eg_read("./ha2@"+str(self.shotNO)+".dat")
+        eg = eg_read("ha2@"+str(self.shotNO)+".dat")
         dhhe = eg.eg_f1('(H+D)/(H+D+He)', self.time_list)
         self.he_ratio = 1-dhhe
         self.d_ratio = self.dh * dhhe
@@ -684,12 +684,12 @@ class CalcMPEXP(GetFiles):
         return 1
 
     def get_ha1(self):
-        eg = eg_read("./ha1@"+str(self.shotNO)+".dat")
+        eg = eg_read("ha1@"+str(self.shotNO)+".dat")
         self.HeI =  eg.eg_f1('HeI(Impmon)', self.time_list)
         return 1
 
     def get_gas_puf(self):
-        eg = eg_read("./gas_puf@"+str(self.shotNO)+".dat")
+        eg = eg_read("gas_puf@"+str(self.shotNO)+".dat")
         # import pdb; pdb.set_trace()
         time = np.array(eg.eg.dimdata)
         data = np.array(eg.eg.data)

@@ -4,8 +4,8 @@ from classes.eg_read import eg_read
 
 
 def get_Isat(self):  # 上書き
-    if os.path.isfile("../makedata/DivIis_tor_sum@" + str(self.shotNO) + ".dat"):
-        eg = eg_read("./DivIis_tor_sum@" + str(self.shotNO) + ".dat")
+    if os.path.isfile("../egdata/DivIis_tor_sum@" + str(self.shotNO) + ".dat"):
+        eg = eg_read("DivIis_tor_sum@" + str(self.shotNO) + ".dat")
         gdn_info = self.get_gdn_info("./DivIis_tor_sum@" + str(self.shotNO) + ".dat")
         for i, nL in enumerate(
             [

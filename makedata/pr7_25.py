@@ -372,6 +372,13 @@ class DetachData(CalcMPEXP):
         if "ar_soxmos" in header:
             self.output_dict["ar_soxmos"] = self.ar_soxmos
 
+        lengths = [len(self.output_dict[s]) for s in header if s in self.output_dict]
+        print("Header:", header)
+        print("Lengths:", lengths)
+        print("Output dict keys:", self.output_dict.keys())
+        if len(set(lengths)) != 1:
+            print(f"Error: 配列の長さが一致していません: {lengths}")
+            return
         savelines = np.vstack([self.output_dict[s] for s in header]).T
 
         with open(self.savename, "a") as f_handle:

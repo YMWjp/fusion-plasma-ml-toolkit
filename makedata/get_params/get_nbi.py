@@ -28,9 +28,9 @@ def get_nbi(self):
                 return abs
 
         for s in tan_names:
-            # eg = eg_read("./nb"+s+"pwr@"+str(self.shotNO)+".dat")
+            # eg = eg_read("nb"+s+"pwr@"+str(self.shotNO)+".dat")
             # _temporalしかない放電もある．原因不明　そのためtemporalのまま
-            eg = eg_read("./nb" + s + "pwr_temporal@" + str(self.shotNO) + ".dat")
+            eg = eg_read("nb" + s + "pwr_temporal@" + str(self.shotNO) + ".dat")
             # pdb.set_trace()
             unit = eg.eg.valunits()[eg.eg.valname2idx("Pport-through_nb" + s)]
             if unit == "kW":
@@ -66,7 +66,7 @@ def get_nbi(self):
         nb_tmp = np.zeros_like(self.time_list)
         perp_names = ["4a", "4b", "5a", "5b"]
         for s in perp_names:
-            eg = eg_read("./nb" + s + "pwr_temporal@" + str(self.shotNO) + ".dat")
+            eg = eg_read("nb" + s + "pwr_temporal@" + str(self.shotNO) + ".dat")
             unit = eg.eg.valunits()[eg.eg.valname2idx("Pport-through_nb" + s)]
             if unit == "kW":
                 nb_tmp = np.vstack(

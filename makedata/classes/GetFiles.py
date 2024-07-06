@@ -17,7 +17,7 @@ class GetFiles(object):
         isfile = 1
         for diag in self.diag_list:
             # import pdb; pdb.set_trace()
-            outputname = '{0}@{1}.dat'.format(diag, self.shotNO)
+            outputname = '../egdata/{0}@{1}.dat'.format(diag, self.shotNO)
             if os.path.isfile(outputname):
                 print(outputname, ": exist")
                 continue

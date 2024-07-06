@@ -1,7 +1,8 @@
 import re
 import math
-import os
 import numpy
+import logger
+import zipfile
 
 class egdb():
     """
@@ -233,29 +234,29 @@ class egdb():
             fp.close()
         # lines = self.fileName.readlines()
 
-        for i, l in enumerate(lines):
+        for i, line in enumerate(lines):
             #l = l.decode()
-            l = l.strip('\n')
-            l = l.strip('\r')
-            l = l.strip(',')
-            if len(l) == 0: continue
-            if l[0] == '#':
-                self.parseLine(l[1:])
+            line = line.strip('\n')
+            line = line.strip('\r')
+            line = line.strip(',')
+            if len(line) == 0:
+                continue
+            if line[0] == '#':
+                self.parseLine(line[1:])
                 if self.parametersFlg:
-                    self.parameters = self.parameters+l+'\n'
+                    self.parameters = self.parameters+line+'\n'
                 if self.commentsFlg:
-                    self.comments = self.comments+l+'\n'
+                    self.comments = self.comments+line+'\n'
             else:
                 if self.DimNo != 1:
                     #logger.error("Not Single Dimension Data")
                     return False
-                clm = l.split(self.delim)
+                clm = line.split(self.delim)
                 self.dimdata.append(float(clm[0]))
                 for j, v in enumerate(clm[1:]):
                     try:
                         vm = float(v)
                     except ValueError:
-                        #print v
                         vm = numpy.nan
                     self.data[j].append(float(vm))
         return True
@@ -619,36 +620,37 @@ class egdb2d():
         """
         if self.fileName[-3:].upper() == 'ZIP':
             # open zip file
-            zf = zipfile.ZipFile(self.fileName, 'r')
+            zf = zipfile.ZipFile("./egdata/" + self.fileName, 'r')
             targetname = zf.namelist()[0]
             buff = zf.read(targetname)
             zf.close()
             lines = buff.split('\n')
         else:
-            fp = open(self.fileName, 'r')
+            fp = open("./egdata/" + self.fileName, 'r')
             lines = fp.readlines()
             fp.close()
         # lines = self.fileName.readlines()
 
-        for i, l in enumerate(lines):
+        for i, line in enumerate(lines):
             #l = l.decode()
-            l = l.strip('\n')
-            l = l.strip('\r')
-            l = l.strip(',')
-            if len(l) == 0: continue
-            if l[0] == '#':
-                self.parseLine(l[1:])
+            line = line.strip('\n')
+            line = line.strip('\r')
+            line = line.strip(',')
+            if len(line) == 0:
+                continue
+            if line[0] == '#':
+                self.parseLine(line[1:])
                 if self.parametersFlg:
-                    self.parameters = self.parameters+l+'\n'
+                    self.parameters = self.parameters+line+'\n'
                 if self.commentsFlg:
-                    self.comments = self.comments+l+'\n'
+                    self.comments = self.comments+line+'\n'
             else:
                 if self.DimNo != 1:
                     #logger.error("Not Single Dimension Data")
                     return False
-                l = l.rstrip(', ')
+                line = line.rstrip(', ')
                 # print(l)
-                clm = l.split(self.delim)
+                clm = line.split(self.delim)
                 # print(clm)
                 self.dimdata.append(float(clm[0]))
                 for j, v in enumerate(clm[1:]):
@@ -958,7 +960,7 @@ class egdb3d():
             zf.close()
             lines = buff.split('\n')
         else:
-            fp = open(self.fileName, 'r')
+            fp = open("./egdata/" + self.fileName, 'r')
             lines = fp.readlines()
             fp.close()
 
@@ -966,21 +968,22 @@ class egdb3d():
         c0 = 0
         c1 = 0
         flg = True # Check First for Dim(0)
-        for i, l in enumerate(lines):
-            l = l.strip('\n')
-            l = l.strip(',')
-            if len(l) == 0: continue
-            if l[0] == '#':
-                self.parseLine(l[1:])
+        for i, line in enumerate(lines):
+            line = line.strip('\n')
+            line = line.strip(',')
+            if len(line) == 0:
+                continue
+            if line[0] == '#':
+                self.parseLine(line[1:])
                 if self.parametersFlg:
-                    self.parameters = self.parameters+l+'\n'
+                    self.parameters = self.parameters+line+'\n'
                 if self.commentsFlg:
-                    self.comments = self.comments+l+'\n'
+                    self.comments = self.comments+line+'\n'
             else:
                 if self.DimNo != 2:
                     logger.error("Not Two Dimension Data")
                     return False
-                clm = l.split(self.delim)
+                clm = line.split(self.delim)
 
                 if flg:
                     v = float(clm[0])

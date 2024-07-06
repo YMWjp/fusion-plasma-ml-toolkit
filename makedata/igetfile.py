@@ -42,6 +42,8 @@ def ftpGetFromHttp(shotNO, diagname, subshotNO=1, savename=''):
         # savenameが空の場合、デフォルトのファイル名を生成
         if savename == '':
             savename = '{0}@{1}.dat'.format(diagname, shotNO)
+        else:
+            savename = './egdata/{0}@{1}.dat'.format(diagname, shotNO)
         # テキストデータを指定されたファイル名で保存
         with open(savename, 'w') as f:
             f.write(response.text)
