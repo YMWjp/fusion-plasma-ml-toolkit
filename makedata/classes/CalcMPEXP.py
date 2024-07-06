@@ -287,7 +287,7 @@ class CalcMPEXP(GetFiles):
         return 1
 
     def get_thomson(self,dt=0.01, main=True):
-        eg = egdb2d("./tsmap_nel@"+str(self.shotNO)+".dat")
+        eg = egdb2d("tsmap_nel@"+str(self.shotNO)+".dat")
         eg.readFile()
         # import pdb; pdb.set_trace()
         
@@ -334,7 +334,7 @@ class CalcMPEXP(GetFiles):
             return 1
 
     def jump_correct(self, num=5):
-        eg = egdb2d("./tsmap_nel@"+str(self.shotNO)+".dat")
+        eg = egdb2d("tsmap_nel@"+str(self.shotNO)+".dat")
         eg.readFile()
         # import pdb; pdb.set_trace()
         time_list = np.array(eg.dimdata[1:])
@@ -352,7 +352,7 @@ class CalcMPEXP(GetFiles):
         return f_delta
 
     def get_geom(self,num=9):
-        eg = egdb2d("./tsmap_nel@"+str(self.shotNO)+".dat")
+        eg = egdb2d("tsmap_nel@"+str(self.shotNO)+".dat")
         eg.readFile()
 
         #print(eg.comments)
@@ -479,7 +479,7 @@ class CalcMPEXP(GetFiles):
         return 1
 
     def get_ECH(self):
-        eg_ech = egdb2d("./echpw@"+str(self.shotNO)+".dat")
+        eg_ech = egdb2d("echpw@"+str(self.shotNO)+".dat")
         eg_ech.readFile()
         ech_time_list = np.array(eg_ech.dimdata[1:])
         total_list = np.array(eg_ech.data[eg_ech.valname2idx('Total ECH')][1:])
@@ -537,7 +537,7 @@ class CalcMPEXP(GetFiles):
         return 1
 
     def get_bolo(self):
-        eg_bolo = egdb2d("./bolo@"+str(self.shotNO)+".dat")
+        eg_bolo = egdb2d("bolo@"+str(self.shotNO)+".dat")
         eg_bolo.readFile()
         bolo_time_list = np.array(eg_bolo.dimdata[1:])
         bolo_prad_list = np.array(eg_bolo.data[eg_bolo.valname2idx('Rad_PW')][1:])/1000 #kW -> MW

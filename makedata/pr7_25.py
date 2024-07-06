@@ -137,12 +137,12 @@ class DetachData(CalcMPEXP):
     def def_types(self, shotNO):
         """各時刻のラベルを self.type_list に格納する"""
 
-        datapath = "./egdata/"
+        # datapath = "./egdata/"
 
         def get_egdata(shotNO, diagname, valname):
             """データ取得と整形"""
             getdata(shotNO, diagname, subshotNO=1)
-            filename = datapath + "{0}@{1:d}.dat".format(diagname, shotNO)
+            filename = "{0}@{1:d}.dat".format(diagname, shotNO)
             egfile = egdb2d(filename)
             egfile.readFile()
             time = np.array(egfile.dimdata)
@@ -185,7 +185,12 @@ class DetachData(CalcMPEXP):
             isat7L_grad2 = isat7L_grad[isat7L_time_g > isat7L_grad_max_time]
             isat7L_time2 = isat7L_time_g[isat7L_time_g > isat7L_grad_max_time]
 
+            print("here")
+            print(self.type_list)
+
             self.type_list = np.ones_like(self.time_list)
+
+            print(self.type_list)
 
             if len(isat7L_grad2) != 0 and min(isat7L_grad2) < -higher_grad_threshold:
                 retouch_time = isat7L_time2[np.argmin(isat7L_grad2)]
