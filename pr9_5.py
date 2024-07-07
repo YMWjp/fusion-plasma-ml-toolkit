@@ -118,7 +118,7 @@ np.where(results_header == 'F1score')[0][0]
 
 #カエルのここ
 # 使いたいものの列番号から1を引いた値
-shotdata_f1max = svm_result_data[200]
+shotdata_f1max = svm_result_data[428]
 target_number = 3
 
 weight_before = [float(s) for s in shotdata_f1max[1:len(use_parameter_list)+1]]
@@ -186,7 +186,7 @@ target_parameter_list2 = target_parameter_row_list[label==-1]
 
 
 # y2lim = [0.0001,0.001]
-y2lim = [0.3,3]
+y2lim = [0.4,2.4]
 # y2lim = [0.001,7]
 y2lim_space = linspace(y2lim[0],y2lim[1],10000)
 x_forfig2 = y2lim_space
@@ -224,10 +224,6 @@ for i in func_parameter_list_int:
     print(use_parameter_list[i], i)
     if i == 2:
         xlavel = xlavel + r'$P_{in}^{%s}$' % (round(weight_after[i]*-1/weight_after[target_number],3))
-    elif i == 10:
-        xlavel = xlavel + '$\Delta\Phi_{eff}^{%s}$' % (round(weight_after[i]*-1/weight_after[target_number],3))
-    elif i == 11:
-        xlavel = xlavel + '$\Delta\Theta_{eff}^{%s}$' % (round(weight_after[i]*-1/weight_after[target_number],3))
     else:
         xlavel = xlavel + '$\mathrm{%s}^{%s}$' % (use_parameter_list[i],round(weight_after[i]*-1/weight_after[target_number],3))
 
