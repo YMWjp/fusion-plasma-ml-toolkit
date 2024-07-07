@@ -8,6 +8,7 @@ import numpy as np
 from get_params.get_Isat import get_Isat
 from get_params.get_nbi import get_nbi
 from classes.eg_read import eg_read
+import matplotlib.pyplot as plt
 # from get_params.get_SDLloop import get_SDLloop
 # from get_params.get_beta_e import get_beta_e
 # from get_params.get_soxmos import get_soxmos
@@ -140,8 +141,6 @@ class DetachData(CalcMPEXP):
     def def_types(self, shotNO):
         """各時刻のラベルを self.type_list に格納する"""
 
-        # datapath = "./egdata/"
-
         def get_egdata(shotNO, diagname, valname):
             """データ取得と整形"""
             getdata(shotNO, diagname, subshotNO=1)
@@ -152,118 +151,43 @@ class DetachData(CalcMPEXP):
             data = np.array(egfile.data[egfile.valname2idx(valname)])
             return time, data
 
-        try:
-            # データ取得
-            wp_time, wp_data = get_egdata(shotNO, "wp", "Wp")
-            wp_grad = np.gradient(wp_data)
-            wp_min_time = wp_time[np.argmin(wp_grad)]
-            # wp_time_0 = wp_time[wp_data > 50]
-            # wp_max_time = wp_time_0[0]
+        # データ取得
+        wp_time, wp_data = get_egdata(shotNO, "wp", "Wp")
+        isat7L_time = self.time_list
+        isat7L_data = self.Isat
 
-            # isat7L データの移動平均と勾配の計算
-            isat7L_time = self.time_list
-            isat7L_data = self.Isat_7L
+        # グラフを表示してユーザーにクリックさせる
+        fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True, figsize=(12, 8))
+        
+        # Wpのグラフ
+        ax1.plot(wp_time, wp_data, label='Wp', color='orange')
+        ax1.set_xlabel('Time')
+        ax1.set_ylabel('Wp')
+        ax1.legend()
 
-            # 動的な移動平均ウィンドウサイズの決定
-            window = max(1, len(isat7L_data) // 50)
-            w = np.ones(window) / window
-            isat7L_data_s = np.convolve(isat7L_data, w, mode="same")
-            isat7L_grad = np.gradient(isat7L_data_s)
+        # Isat_7Lのグラフ
+        ax2.plot(isat7L_time, isat7L_data, label='Isat_7L')
+        ax2.set_ylabel('Isat_7L')
+        ax2.legend()
+        
+        # グラフのタイトル
+        fig.suptitle(f'Shot Number: {shotNO}')
 
-            # データ範囲を制限
-            valid_indices = isat7L_time < wp_min_time - 0.1
-            isat7L_grad = isat7L_grad[valid_indices]
-            isat7L_time_g = isat7L_time[valid_indices]
+        def onclick(event):
+            if event.inaxes:
+                click_time = event.xdata
+                start_index = (np.abs(isat7L_time - click_time)).argmin()
+                self.type_list = np.zeros_like(self.time_list)
+                # 選択した点を中心にラベルを設定
+                self.type_list[start_index-15:start_index-5] = -1
+                self.type_list[start_index-5:start_index+5] = 0
+                self.type_list[start_index+5:start_index+15] = 1
+                plt.close()
 
-            # 動的な閾値の設定
-            isat7L_grad_max = max(isat7L_grad)
-            grad_threshold = np.percentile(np.abs(isat7L_grad), 95)
-            higher_grad_threshold = grad_threshold * 1.5  # 厳しい条件のための閾値を設定
-            isat7L_grad_max_time = (
-                isat7L_time_g[np.argmax(isat7L_grad)]
-                if isat7L_grad_max > grad_threshold
-                else wp_min_time - 0.1
-            )
+        fig.canvas.mpl_connect('button_press_event', onclick)
+        plt.show()
 
-            isat7L_grad2 = isat7L_grad[isat7L_time_g > isat7L_grad_max_time]
-            isat7L_time2 = isat7L_time_g[isat7L_time_g > isat7L_grad_max_time]
-
-
-            self.type_list = np.ones_like(self.time_list)
-
-            if len(isat7L_grad2) != 0 and min(isat7L_grad2) < -higher_grad_threshold:
-                retouch_time = isat7L_time2[np.argmin(isat7L_grad2)]
-                type_list = [
-                    0
-                    if t < isat7L_grad_max_time - 0.2
-                    else 1
-                    if t < isat7L_grad_max_time - 0.1
-                    else 0
-                    if t < isat7L_grad_max_time + 0.1
-                    else -1
-                    if t < isat7L_grad_max_time + 0.2
-                    else 0
-                    if t < retouch_time - 0.2
-                    else -1
-                    if t < retouch_time - 0.1
-                    else 0
-                    if t < retouch_time + 0.1
-                    else 1
-                    if t < retouch_time + 0.2
-                    else 0
-                    for t in self.time_list
-                ]
-
-            elif wp_min_time - isat7L_grad_max_time < 0.2:
-                type_list = [
-                    0
-                    if t < isat7L_grad_max_time - 0.2
-                    else 1
-                    if t < isat7L_grad_max_time - 0.1
-                    else 0
-                    for t in self.time_list
-                ]
-            else:
-                isat7L_data_s = isat7L_data_s[isat7L_time < wp_min_time - 0.1]
-                isat7L_data3 = isat7L_data_s[isat7L_time_g >= isat7L_grad_max_time]
-                isat7L_time3 = isat7L_time_g[isat7L_time_g >= isat7L_grad_max_time]
-                isat7L_data3 = isat7L_data3[isat7L_time3 < isat7L_grad_max_time + 0.25]
-                isat7L_time3 = isat7L_time3[isat7L_time3 < isat7L_grad_max_time + 0.25]
-                detach_start_time = isat7L_time3[np.argmin(isat7L_data3)]
-
-                if detach_start_time + 0.05 > isat7L_grad_max_time + 0.2:
-                    type_list = [
-                        0
-                        if t < isat7L_grad_max_time - 0.2
-                        else 1
-                        if t < isat7L_grad_max_time - 0.1
-                        else 0
-                        if t < detach_start_time - 0.05
-                        else -1
-                        if t < detach_start_time + 0.05
-                        else 0
-                        for t in self.time_list
-                    ]
-                else:
-                    type_list = [
-                        0
-                        if t < isat7L_grad_max_time - 0.2
-                        else 1
-                        if t < isat7L_grad_max_time - 0.1
-                        else 0
-                        if t < isat7L_grad_max_time + 0.1
-                        else -1
-                        if t < isat7L_grad_max_time + 0.2
-                        else 0
-                        for t in self.time_list
-                    ]
-
-            self.type_list = type_list
-            return 1
-
-        except Exception as e:
-            print(f"Error occurred: {e}")
-            return 0
+        return 1
 
     def pinput(self, new=False):
         if new:
