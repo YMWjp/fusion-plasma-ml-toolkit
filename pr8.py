@@ -29,7 +29,7 @@ parameters = [
     'B', 
     # 'Pech', 'Pnbi-tan', 'Pnbi-perp', 
     'Pinput', 
-    # 'Prad', 
+    'Prad', 
     'Prad/Pinput', 
     # 'Wp',
     'beta',
@@ -48,8 +48,8 @@ parameters = [
     # 'Te@edge',
     #, 'ne@center'#, 'ne_peak'
     # 'RMP_LID',
-    'SDLloop_dPhi',
-    'SDLloop_dTheta'
+    # 'SDLloop_dPhi',
+    # 'SDLloop_dTheta'
     # ,'beta_e','collision','beta0'
     # ,'fig6I', 'pcc3O', 'fig/pcc'
     # , 'ne_soxmos', 'ar_soxmos'

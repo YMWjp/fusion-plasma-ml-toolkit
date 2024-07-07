@@ -4,10 +4,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 from numpy.core.function_base import linspace
 
-date = '20240522'
+date = '20240707'
 datapath = './results/'+date+'/dataset.csv'
 datapath2 = './results/'+date+'/label.csv'
-datapath3 = './results/'+date+'/result7.tsv'
+datapath3 = './results/'+date+'/result6.tsv'
 datapath4 = './results/'+date+'/parameter.csv'
 datapath5 = './results/'+date+'/dataset_minmax.csv'
 
@@ -118,7 +118,7 @@ np.where(results_header == 'F1score')[0][0]
 
 #カエルのここ
 # 使いたいものの列番号から1を引いた値
-shotdata_f1max = svm_result_data[792]
+shotdata_f1max = svm_result_data[200]
 target_number = 3
 
 weight_before = [float(s) for s in shotdata_f1max[1:len(use_parameter_list)+1]]
@@ -186,15 +186,15 @@ target_parameter_list2 = target_parameter_row_list[label==-1]
 
 
 # y2lim = [0.0001,0.001]
-y2lim = [0.1,0.35]
+y2lim = [0.3,3]
 # y2lim = [0.001,7]
 y2lim_space = linspace(y2lim[0],y2lim[1],10000)
 x_forfig2 = y2lim_space
 # print(len(func_func1_list))
 # print(len(target_parameter_list))
 
-axes4.plot(func_func1_list1,target_parameter_list1,'.',color='blue',label='detach', markersize=30)
-axes4.plot(func_func1_list2,target_parameter_list2,'.',color='red',label='attach', markersize=30)
+axes4.plot(func_func1_list1,target_parameter_list1,'.',color='blue',label='detach', markersize=20)
+axes4.plot(func_func1_list2,target_parameter_list2,'.',color='red',label='attach', markersize=20)
 axes4.plot(x_forfig2,y2lim_space,color='black')
 axes4.legend(labelcolor='linecolor',markerscale=1)
 # plt.ylim(np.min(target_parameter_row_list),np.max(target_parameter_row_list))
@@ -232,6 +232,10 @@ for i in func_parameter_list_int:
         xlavel = xlavel + '$\mathrm{%s}^{%s}$' % (use_parameter_list[i],round(weight_after[i]*-1/weight_after[target_number],3))
 
 axes4.set_xlabel(xlavel, fontsize=18)
+for i in range(len(target_parameter_list1)):
+    if target_parameter_list1[i] >= 2:
+        print(f"Index: {i}, Value: {target_parameter_list1[i]}, Func Value: {func_func1_list1[i]}")
+
 
 plt.savefig('./hist&sccaterpng/sccater_rmp_'+str(date)+'target'+str(target_number)+'.png')
 plt.show()
