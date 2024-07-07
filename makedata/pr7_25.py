@@ -262,7 +262,7 @@ class DetachData(CalcMPEXP):
         if "Isat@6L" in header:
             self.output_dict["Isat@6L"] = self.Isat_6L
         if "Isat@7L" in header:
-            self.output_dict["Isat@7L"] = self.Isat_7L
+            self.output_dict["Isat@7L"] = self.Isat
         if "reff@100eV" in header:
             self.output_dict["reff@100eV"] = self.reff100eV
         if "ne@100eV" in header:
