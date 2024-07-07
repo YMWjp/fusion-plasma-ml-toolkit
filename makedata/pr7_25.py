@@ -7,6 +7,7 @@ from getfile_http_2024 import getdata
 import numpy as np
 from get_params.get_Isat import get_Isat
 from get_params.get_nbi import get_nbi
+from classes.eg_read import eg_read
 # from get_params.get_SDLloop import get_SDLloop
 # from get_params.get_beta_e import get_beta_e
 # from get_params.get_soxmos import get_soxmos
@@ -102,6 +103,8 @@ class DetachData(CalcMPEXP):
         self.get_Ip()
         # self.get_Pzero()
         get_Isat(self)
+        eg = eg_read("DivIis_tor_sum@"+str(self.shotNO)+".dat")
+        self.Isat = eg.eg_f1('Iis_7L@20', self.time_list)
         self.get_ha()
         self.get_ha3()
         self.get_ha2()
@@ -185,12 +188,8 @@ class DetachData(CalcMPEXP):
             isat7L_grad2 = isat7L_grad[isat7L_time_g > isat7L_grad_max_time]
             isat7L_time2 = isat7L_time_g[isat7L_time_g > isat7L_grad_max_time]
 
-            print("here")
-            print(self.type_list)
 
             self.type_list = np.ones_like(self.time_list)
-
-            print(self.type_list)
 
             if len(isat7L_grad2) != 0 and min(isat7L_grad2) < -higher_grad_threshold:
                 retouch_time = isat7L_time2[np.argmin(isat7L_grad2)]

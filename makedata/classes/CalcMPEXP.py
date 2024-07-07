@@ -1089,6 +1089,7 @@ class CalcMPEXP(GetFiles):
         axes[4].plot(self.time_list, self.Pcc, c=color_l)
         axes[4].set_ylabel(r'$P_{cc}^{(10-O)}$[Pa]',fontsize=14)
         ax4_2 = axes[4].twinx()
+        print(self.Isat)
         ax4_2.plot(self.time_list, self.Isat, c=color_r)
         ax4_2.set_ylabel(r'$I_{sat}^{(7L)}$[A]',fontsize=14)
 
@@ -1422,7 +1423,7 @@ class CalcMPEXP(GetFiles):
         # axes[4].plot(self.time_list8R, self.Isat_8R1, label='Isat_8R')
         # axes[4].set_ylabel(r'$Isat_{8}$[A]',fontsize=13)
 
-        axes[5].plot(self.time_list, self.Isat_7L, label='Isat_7L')
+        axes[5].plot(self.time_list, self.Isat, label='Isat_7L')
         axes[5].set_ylabel(r'$Isat_{7}$[A]',fontsize=13)
 
         # axes[6].plot(self.time_list10L, self.Isat_10L1, label='Isat_10L')
