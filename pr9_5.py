@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from numpy.core.function_base import linspace
 
-date = '20240707'
+date = '20240812'
 datapath = './results/'+date+'/dataset.csv'
 datapath2 = './results/'+date+'/label.csv'
 datapath3 = './results/'+date+'/result6.tsv'
@@ -118,7 +118,7 @@ np.where(results_header == 'F1score')[0][0]
 
 #カエルのここ
 # 使いたいものの列番号から1を引いた値
-shotdata_f1max = svm_result_data[428]
+shotdata_f1max = svm_result_data[1386]
 target_number = 3
 
 weight_before = [float(s) for s in shotdata_f1max[1:len(use_parameter_list)+1]]
@@ -224,6 +224,10 @@ for i in func_parameter_list_int:
     print(use_parameter_list[i], i)
     if i == 2:
         xlavel = xlavel + r'$P_{in}^{%s}$' % (round(weight_after[i]*-1/weight_after[target_number],3))
+    elif i == 11:
+        xlavel = xlavel + '$\Delta\Phi_{eff}^{%s}$' % (round(weight_after[i]*-1/weight_after[target_number],3))
+    elif i == 12:
+        xlavel = xlavel + '$\Delta\Theta_{eff}^{%s}$' % (round(weight_after[i]*-1/weight_after[target_number],3))
     else:
         xlavel = xlavel + '$\mathrm{%s}^{%s}$' % (use_parameter_list[i],round(weight_after[i]*-1/weight_after[target_number],3))
 

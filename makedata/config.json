@@ -34,7 +34,10 @@
     "dVdreff@100eV",
     "Te@center",
     "Te@edge",
-    "ne@center"
+    "ne@center",
+    "SDLloop_dPhi",
+    "SDLloop_dPhi_ext",
+    "SDLloop_dTheta"
   ],
   "_comment": [
     "delta_sh",
@@ -42,9 +45,6 @@
     "Pcc",
     "ne_peak",
     "RMP_LID",
-    "SDLloop_dPhi",
-    "SDLloop_dPhi_ext",
-    "SDLloop_dTheta",
     "beta_e",
     "collision",
     "beta0",

@@ -9,7 +9,7 @@ from get_params.get_Isat import get_Isat
 from get_params.get_nbi import get_nbi
 from classes.eg_read import eg_read
 import matplotlib.pyplot as plt
-# from get_params.get_SDLloop import get_SDLloop
+from get_params.get_SDLloop import get_SDLloop
 # from get_params.get_beta_e import get_beta_e
 # from get_params.get_soxmos import get_soxmos
 # from get_params.get_beta0 import get_beta0
@@ -113,7 +113,7 @@ class DetachData(CalcMPEXP):
         self.get_te()
         self.ISS_Wp()
         # get_rmp_lid(self, shotNO)
-        # get_SDLloop(self, shotNO)
+        get_SDLloop(self, shotNO)
         # get_beta_e(self)
         # get_col(self, shotNO)
         # get_beta0(self, shotNO)
@@ -191,9 +191,9 @@ class DetachData(CalcMPEXP):
 
     def pinput(self, new=False):
         if new:
-            return self.ech + self.nbi_tan + self.nbi_perp * 0.5
+            return (self.ech + self.nbi_tan + self.nbi_perp * 0.5) 
         else:
-            return self.ech + self.nbi_tan + self.nbi_perp * 0.36
+            return (self.ech + self.nbi_tan + self.nbi_perp * 0.36)
 
     def norm_prad(self):
         pinput = self.pinput()
