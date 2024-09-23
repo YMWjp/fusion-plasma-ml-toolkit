@@ -5,6 +5,10 @@
 2.  →
     python pr8.py [date] [K(1~14)]
 
+    or
+
+    make run [data] で一気に実行
+
 3.  →
     python F1score.py -d [date]
 
