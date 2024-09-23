@@ -7,7 +7,7 @@ from numpy.core.function_base import linspace
 date = '20240812'
 datapath = './results/'+date+'/dataset.csv'
 datapath2 = './results/'+date+'/label.csv'
-datapath3 = './results/'+date+'/result6.tsv'
+datapath3 = './results/'+date+'/result4.tsv'
 datapath4 = './results/'+date+'/parameter.csv'
 datapath5 = './results/'+date+'/dataset_minmax.csv'
 
@@ -118,7 +118,7 @@ np.where(results_header == 'F1score')[0][0]
 
 #カエルのここ
 # 使いたいものの列番号から1を引いた値
-shotdata_f1max = svm_result_data[1386]
+shotdata_f1max = svm_result_data[515]
 target_number = 3
 
 weight_before = [float(s) for s in shotdata_f1max[1:len(use_parameter_list)+1]]
@@ -228,6 +228,8 @@ for i in func_parameter_list_int:
         xlavel = xlavel + '$\Delta\Phi_{eff}^{%s}$' % (round(weight_after[i]*-1/weight_after[target_number],3))
     elif i == 12:
         xlavel = xlavel + '$\Delta\Theta_{eff}^{%s}$' % (round(weight_after[i]*-1/weight_after[target_number],3))
+    elif use_parameter_list[i] == 'Prad/Pinput':
+        xlavel = xlavel + '$P_\mathrm{rad}/P_\mathrm{input}^{%s}$' % (round(weight_after[i]*-1/weight_after[target_number],3))
     else:
         xlavel = xlavel + '$\mathrm{%s}^{%s}$' % (use_parameter_list[i],round(weight_after[i]*-1/weight_after[target_number],3))
 
@@ -236,6 +238,19 @@ for i in range(len(target_parameter_list1)):
     if target_parameter_list1[i] >= 2:
         print(f"Index: {i}, Value: {target_parameter_list1[i]}, Func Value: {func_func1_list1[i]}")
 
+
+# 黒い線よりも下にある赤い点（'attach'状態）のデータポイントを見つける
+below_line_indices = np.where((label == -1) & (target_parameter_row_list < func_func1_list))[0]
+
+print("黒い線よりも下にある'attach'状態のデータポイント:")
+for idx in below_line_indices:
+    print(f"インデックス: {idx}")
+    print(f"  x値 (func_func1): {func_func1_list[idx]}")
+    print(f"  y値 (target_parameter): {target_parameter_row_list[idx]}")
+    print(f"  元のデータ: {data[idx]}")
+    print("---")
+
+print(f"該当するデータポイントの総数: {len(below_line_indices)}")
 
 plt.savefig('./hist&sccaterpng/sccater_rmp_'+str(date)+'target'+str(target_number)+'.png')
 plt.show()
