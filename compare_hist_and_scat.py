@@ -1,202 +1,146 @@
-#1パラメータ分離させた領域図_rap影響評価に使用
 from common import names_dict
 import numpy as np
 import matplotlib.pyplot as plt
 from numpy.core.function_base import linspace
 
-date = '20240923'
-datapath = './results/'+date+'/dataset.csv'
-datapath2 = './results/'+date+'/label.csv'
-datapath3 = './results/'+date+'/result4.tsv'
-datapath4 = './results/'+date+'/parameter.csv'
-datapath5 = './results/'+date+'/dataset_minmax.csv'
+# グローバル定数
+DATE = '20240923'
+RESULTS_DIR = f'./results/{DATE}/'
+TARGET_NUMBER = 11
+EPSILON = 1e-10
+SVM_RESULT_INDEX = 224  # 新しく追加したグローバル定数
 
-data = np.loadtxt(
-    datapath, delimiter=','
-    )
-data_row = np.loadtxt(
-    datapath, dtype=str, delimiter=',', comments='&'
-    )
-label = np.loadtxt(
-    datapath2
-    )
-header = data_row[0]
-header[0] = header[0].strip('# ')
-with open (datapath3,'r') as f :
-    names = f.readline().lstrip(' ').rstrip('\n')
-svm_result_data = np.loadtxt(
-    datapath3,dtype = str
-    )
-svm_result_data_t = np.loadtxt(
-    datapath3,dtype = str, skiprows=1
-    ).T
-with open (datapath4,'r') as f :
-    names = f.readline().lstrip(' ').rstrip('\n')
-use_parameter_list = np.loadtxt(
-    datapath4,delimiter=',',dtype = str
-    )
-with open (datapath5,'r') as f :
-    names = f.readline().lstrip(' ').rstrip('\n')
-minmax_data = np.loadtxt(
-    datapath5,skiprows=1,delimiter=','
-    )
+# ファイルパスの定義
+FILE_PATHS = {
+    'dataset': f'{RESULTS_DIR}dataset.csv',
+    'label': f'{RESULTS_DIR}label.csv',
+    'result': f'{RESULTS_DIR}result4.tsv',
+    'parameter': f'{RESULTS_DIR}parameter.csv',
+    'dataset_minmax': f'{RESULTS_DIR}dataset_minmax.csv'
+}
 
+def load_data():
+    try:
+        data = np.loadtxt(FILE_PATHS['dataset'], delimiter=',')
+        label = np.loadtxt(FILE_PATHS['label'])
+        svm_result_data = np.loadtxt(FILE_PATHS['result'], dtype=str)
+        use_parameter_list = np.loadtxt(FILE_PATHS['parameter'], delimiter=',', dtype=str)
+        minmax_data = np.loadtxt(FILE_PATHS['dataset_minmax'], skiprows=1, delimiter=',')
+    except IOError as e:
+        print(f"ファイルの読み込みエラー: {e}")
+        return None, None, None, None, None
+    return data, label, minmax_data, use_parameter_list, svm_result_data
 
-n0 = 2
-n1 = 6
-n2 = 7
-data0 = data[:,n0]
-data0 = np.e**(data0*(minmax_data[0,n0]-minmax_data[1,n0])+minmax_data[1,n0])
-data01 = data0[label==1]
-data02 = data0[label==-1]
-data1 = data[:,n1]
-data1 = np.e**(data1*(minmax_data[0,n1]-minmax_data[1,n1])+minmax_data[1,n1])
-data11 = data1[label==1]
-data12 = data1[label==-1]
-data2 = data[:,n2]
-data2 = np.e**(data2*(minmax_data[0,n2]-minmax_data[1,n2])+minmax_data[1,n2])
-data21 = data2[label==1]
-data22 = data2[label==-1]
+def process_data(data, label, minmax_data):
+    n0, n1, n2 = 2, 6, 7
+    data0 = np.e**(data[:, n0] * (minmax_data[0, n0] - minmax_data[1, n0]) + minmax_data[1, n0])
+    data1 = np.e**(data[:, n1] * (minmax_data[0, n1] - minmax_data[1, n1]) + minmax_data[1, n1])
+    data2 = np.e**(data[:, n2] * (minmax_data[0, n2] - minmax_data[1, n2]) + minmax_data[1, n2])
+    
+    return {
+        'data0': {'all': data0, 'pos': data0[label==1], 'neg': data0[label==-1]},
+        'data1': {'all': data1, 'pos': data1[label==1], 'neg': data1[label==-1]},
+        'data2': {'all': data2, 'pos': data2[label==1], 'neg': data2[label==-1]}
+    }
 
-
-
-n3 = 2
-data3 = data[:,n3]
-data3 = np.e**(data3*(minmax_data[0,n3]-minmax_data[1,n3])+minmax_data[1,n3])
-data31 = data3[label==1]
-data32 = data3[label==-1]
-
-plt.rcParams["font.size"] =25 #フォントサイズを一括で変更
-plt.rcParams['lines.linewidth'] = 2 #線の太さを一括で変更
-fig = plt.figure(figsize=(10,8)) #figureを準備
-plt.subplots_adjust(
-    left=0.2,right=0.90,bottom=0.125,top=0.94,hspace=0.3
-    )
-
-axes4 = plt.subplot()
-
-results_header = svm_result_data[0]
-svm_result_data_onlyfloat = svm_result_data_t[1:]
-
-np.where(results_header == 'F1score')[0][0]
-
-#カエルのここ
-# 使いたいものの列番号から1を引いた値
-shotdata_f1max = svm_result_data[224]
-target_number = 11
-
-weight_before = [float(s) for s in shotdata_f1max[1:len(use_parameter_list)+1]]
-# weight_afterの計算でゼロ除算を避けるためのチェックを追加
-epsilon = 1e-10  # 小さな値を追加してゼロ除算を避ける
-weight_after = weight_before / (minmax_data[0] - minmax_data[1] + epsilon)
-bias_after = float(shotdata_f1max[len(use_parameter_list)+1])
-for i in range(len(use_parameter_list)):
-    bias_after = bias_after - weight_after[i]*minmax_data[1,i]
-
-def func_func(datain_shot=[]):
-    #まずwとbの補正
-    f = 1
-    datain_shot_row  = np.zeros(len(use_parameter_list))
+def calculate_weights(shotdata_f1max, use_parameter_list, minmax_data):
+    weight_before = [float(s) for s in shotdata_f1max[1:len(use_parameter_list)+1]]
+    weight_after = weight_before / (minmax_data[0] - minmax_data[1] + EPSILON)
+    bias_after = float(shotdata_f1max[len(use_parameter_list)+1])
     for i in range(len(use_parameter_list)):
-        datain_shot_row[i] = np.e**(datain_shot[i]*(minmax_data[0,i]-minmax_data[1,i])+minmax_data[1,i])
-        f = f * datain_shot_row[i]**weight_after[i]
-    f = f * np.e ** bias_after
-    return f
+        bias_after -= weight_after[i] * minmax_data[1, i]
+    return weight_after, bias_after
 
-func_func_list = np.zeros(len(data))
-
-for i in range(len(data)):
-    func_func_list[i] = func_func(datain_shot=data[i])
-
-
-func_func_list1 = func_func_list[label==1]
-func_func_list2 = func_func_list[label==-1]
-
-x0lim_log = [np.log10(np.min(func_func_list))-(np.log10(np.max(func_func_list))+np.log10(np.min(func_func_list)))/10,np.log10(np.max(func_func_list))+(np.log10(np.max(func_func_list))+np.log10(np.min(func_func_list)))/10]
-
-
-
-#以下、一要素と他要素の散布図
-def func_func1(n,datain_shot=[]):
+def func_func(datain_shot, weight_after, bias_after, use_parameter_list, minmax_data):
     f = 1
-    datain_shot2 = np.delete(datain_shot,n)
-    min_data = minmax_data[1]
-    max_data = minmax_data[0]
-    min_data = np.delete(min_data,n)
-    max_data = np.delete(max_data,n)
-    weight_after2 = np.delete(weight_after,n)
-    weight_after2 = weight_after2*-1/weight_after[n]
-    datain_shot_row  = np.zeros(len(use_parameter_list)-1)
-    for i in range(len(use_parameter_list)-1):
-        datain_shot_row[i] = np.e**(datain_shot2[i]*(max_data[i]-min_data[i])+min_data[i])
-        f = f * datain_shot_row[i]**weight_after2[i]
-    f = f * np.e ** (bias_after*-1/weight_after[n])
+    datain_shot_row = np.zeros(len(use_parameter_list))
+    for i in range(len(use_parameter_list)):
+        datain_shot_row[i] = np.e**(datain_shot[i] * (minmax_data[0, i] - minmax_data[1, i]) + minmax_data[1, i])
+        f *= datain_shot_row[i]**weight_after[i]
+    f *= np.e ** bias_after
     return f
 
-func_func1_list = np.zeros(len(data))
-for i in range(len(data)):
-    func_func1_list[i] = func_func1(target_number,datain_shot=data[i])
-func_func1_list1 = func_func1_list[label==1]
-func_func1_list2 = func_func1_list[label==-1]
-target_parameter_list = data[:,target_number]
-target_parameter_row_list = np.e**(target_parameter_list*(minmax_data[0,target_number]-minmax_data[1,target_number])+minmax_data[1,target_number])
-target_parameter_list1 = target_parameter_row_list[label==1]
-target_parameter_list2 = target_parameter_row_list[label==-1]
+def func_func1(n, datain_shot, weight_after, bias_after, use_parameter_list, minmax_data):
+    f = 1
+    datain_shot2 = np.delete(datain_shot, n)
+    min_data = np.delete(minmax_data[1], n)
+    max_data = np.delete(minmax_data[0], n)
+    weight_after2 = np.delete(weight_after, n) * -1 / weight_after[n]
+    datain_shot_row = np.zeros(len(use_parameter_list) - 1)
+    for i in range(len(use_parameter_list) - 1):
+        datain_shot_row[i] = np.e**(datain_shot2[i] * (max_data[i] - min_data[i]) + min_data[i])
+        f *= datain_shot_row[i]**weight_after2[i]
+    f *= np.e ** (bias_after * -1 / weight_after[n])
+    return f
 
+def create_xlabel(shotdata_f1max, bias_after, weight_after, use_parameter_list):
+    func_parameter_list_int = [int(s) for s in shotdata_f1max[0].split(',')]
+    if TARGET_NUMBER in func_parameter_list_int:
+        func_parameter_list_int.remove(TARGET_NUMBER)
+    
+    xlabel = '${e}^{%s}$' % str(round(bias_after * -1 / weight_after[TARGET_NUMBER], 2))
+    for i in func_parameter_list_int:
+        if i == 2:
+            xlabel += r'$P_{in}^{%s}$' % (round(weight_after[i] * -1 / weight_after[TARGET_NUMBER], 2))
+        elif i == 11:
+            xlabel += '$\Delta\Phi_{eff}^{%s}$' % (round(weight_after[i] * -1 / weight_after[TARGET_NUMBER], 2))
+        elif i == 12:
+            xlabel += '$\Delta\Theta_{eff}^{%s}$' % (round(weight_after[i] * -1 / weight_after[TARGET_NUMBER], 2))
+        elif use_parameter_list[i] == 'Prad/Pinput':
+            xlabel += '$P_\mathrm{rad}/P_\mathrm{in}^{%s}$' % (round(weight_after[i] * -1 / weight_after[TARGET_NUMBER], 2))
+        else:
+            xlabel += '$\mathrm{%s}^{%s}$' % (use_parameter_list[i], round(weight_after[i] * -1 / weight_after[TARGET_NUMBER], 2))
+    
+    return xlabel
 
+def plot_scatter(func_func1_list1, target_parameter_list1, func_func1_list2, target_parameter_list2, y2lim_space, xlabel, ylabel):
+    plt.rcParams["font.size"] = 25
+    plt.rcParams['lines.linewidth'] = 2
+    plt.figure(figsize=(10, 8))
+    plt.subplots_adjust(left=0.2, right=0.90, bottom=0.125, top=0.94, hspace=0.3)
 
-# target_parameter_list1 = target_parameter_list1/data31
-# target_parameter_list2 = target_parameter_list2/data32
+    axes4 = plt.subplot()
+    axes4.plot(func_func1_list1, target_parameter_list1, '.', color='blue', label='detach', markersize=20)
+    axes4.plot(func_func1_list2, target_parameter_list2, '.', color='red', label='attach', markersize=20)
+    axes4.plot(y2lim_space, y2lim_space, color='black')
+    axes4.legend(labelcolor='linecolor', markerscale=1)
+    axes4.set_xscale("log")
+    axes4.set_xlabel(xlabel, fontsize=18)
+    axes4.set_ylabel(ylabel)
 
+    plt.savefig(f'./hist&sccaterpng/sccater_rmp_{DATE}target{TARGET_NUMBER}.png')
+    plt.show()
 
-# y2lim = [0.0001,0.001]
-y2lim = [0,0.0011]
-# y2lim = [0.001,7]
-y2lim_space = linspace(y2lim[0],y2lim[1],10000)
-x_forfig2 = y2lim_space
-# print(len(func_func1_list))
-# print(len(target_parameter_list))
+def run_analysis():
+    data, label, minmax_data, use_parameter_list, svm_result_data = load_data()
+    if data is None:
+        return
 
-axes4.plot(func_func1_list1,target_parameter_list1,'.',color='blue',label='detach', markersize=20)
-axes4.plot(func_func1_list2,target_parameter_list2,'.',color='red',label='attach', markersize=20)
-axes4.plot(x_forfig2,y2lim_space,color='black')
-axes4.legend(labelcolor='linecolor',markerscale=1)
-# plt.ylim(np.min(target_parameter_row_list),np.max(target_parameter_row_list))
-axes4.set_xscale("log")
+    shotdata_f1max = svm_result_data[SVM_RESULT_INDEX]
+    weight_after, bias_after = calculate_weights(shotdata_f1max, use_parameter_list, minmax_data)
 
+    func_func1_list = np.array([func_func1(TARGET_NUMBER, d, weight_after, bias_after, use_parameter_list, minmax_data) for d in data])
+    func_func1_list1 = func_func1_list[label == 1]
+    func_func1_list2 = func_func1_list[label == -1]
 
-with open(datapath4, 'r') as f:
-    parameter_list = [line.strip() for line in f]
-axes4.set_ylabel(names_dict.get(parameter_list[target_number], parameter_list[target_number]))
+    target_parameter_list = data[:, TARGET_NUMBER]
+    target_parameter_row_list = np.e**(target_parameter_list * (minmax_data[0, TARGET_NUMBER] - minmax_data[1, TARGET_NUMBER]) + minmax_data[1, TARGET_NUMBER])
+    target_parameter_list1 = target_parameter_row_list[label == 1]
+    target_parameter_list2 = target_parameter_row_list[label == -1]
 
-# Parse func_parameter_list
-func_parameter_list = shotdata_f1max[0].split(',')
-func_parameter_list_int = [int(s) for s in func_parameter_list]
+    y2lim = [0, 0.0011]
+    y2lim_space = linspace(y2lim[0], y2lim[1], 10000)
 
-print(func_parameter_list_int)
+    with open(FILE_PATHS['parameter'], 'r') as f:
+        parameter_list = [line.strip() for line in f]
+    ylabel = names_dict.get(parameter_list[TARGET_NUMBER], parameter_list[TARGET_NUMBER])
 
-# Remove target_number from the list
-if target_number in func_parameter_list_int:
-    func_parameter_list_int.remove(target_number)
-else:
-    print(f"警告: {target_number}はリスト内に存在しません。")
+    xlabel = create_xlabel(shotdata_f1max, bias_after, weight_after, use_parameter_list)
 
-print(func_parameter_list_int)
-xlavel = '${e}^{%s}$' % str(round(bias_after*-1/weight_after[target_number], 3))
-for i in func_parameter_list_int:
-    print(use_parameter_list[i], i)
-    if i == 2:
-        xlavel = xlavel + r'$P_{in}^{%s}$' % (round(weight_after[i]*-1/weight_after[target_number],3))
-    elif i == 11:
-        xlavel = xlavel + '$\Delta\Phi_{eff}^{%s}$' % (round(weight_after[i]*-1/weight_after[target_number],3))
-    elif i == 12:
-        xlavel = xlavel + '$\Delta\Theta_{eff}^{%s}$' % (round(weight_after[i]*-1/weight_after[target_number],3))
-    elif use_parameter_list[i] == 'Prad/Pinput':
-        xlavel = xlavel + '$P_\mathrm{rad}/P_\mathrm{in}^{%s}$' % (round(weight_after[i]*-1/weight_after[target_number],3))
-    else:
-        xlavel = xlavel + '$\mathrm{%s}^{%s}$' % (use_parameter_list[i],round(weight_after[i]*-1/weight_after[target_number],3))
+    plot_scatter(func_func1_list1, target_parameter_list1, func_func1_list2, target_parameter_list2, y2lim_space, xlabel, ylabel)
 
-axes4.set_xlabel(xlavel, fontsize=18)
+def main():
+    run_analysis()
 
-plt.savefig('./hist&sccaterpng/sccater_rmp_'+str(date)+'target'+str(target_number)+'.png')
-plt.show()
+if __name__ == "__main__":
+    main()
