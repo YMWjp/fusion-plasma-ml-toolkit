@@ -3,14 +3,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 from numpy.core.function_base import linspace
 
-# グローバル定数
+# Global constants
 DATE = '20240923'
 RESULTS_DIR = f'./results/{DATE}/'
 TARGET_NUMBER = 11
 EPSILON = 1e-10
-SVM_RESULT_INDEX = 224  # 新しく追加したグローバル定数
+SVM_RESULT_INDEX = 224
 
-# ファイルパスの定義
+# File paths definition
 FILE_PATHS = {
     'dataset': f'{RESULTS_DIR}dataset.csv',
     'label': f'{RESULTS_DIR}label.csv',
@@ -27,7 +27,7 @@ def load_data():
         use_parameter_list = np.loadtxt(FILE_PATHS['parameter'], delimiter=',', dtype=str)
         minmax_data = np.loadtxt(FILE_PATHS['dataset_minmax'], skiprows=1, delimiter=',')
     except IOError as e:
-        print(f"ファイルの読み込みエラー: {e}")
+        print(f"File reading error: {e}")
         return None, None, None, None, None
     return data, label, minmax_data, use_parameter_list, svm_result_data
 
@@ -140,6 +140,7 @@ def run_analysis():
     plot_scatter(func_func1_list1, target_parameter_list1, func_func1_list2, target_parameter_list2, y2lim_space, xlabel, ylabel)
 
 def main():
+    # Entry point of the script
     run_analysis()
 
 if __name__ == "__main__":
