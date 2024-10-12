@@ -78,13 +78,13 @@ class ResultsClass():
     def load_dataset(self):
         f = open('./results/'+self.date+'/dataset.csv','r')
         self.parameters = f.readline().lstrip('# ').rstrip('\n').split(',')
-        print(self.parameters)
+        # print(self.parameters)
 
         if len(self.params_order_str) > 0:
             self.params_order = np.array([self.parameters.index(s) for s in self.params_order_str])
         else:
             self.params_order = np.arange(0,len(self.parameters),1)
-        print(self.params_order)
+        # print(self.params_order)
 
         self.data = np.loadtxt('./results/'+self.date+'/dataset.csv', skiprows=1, delimiter=',')
         self.labels = np.loadtxt('./results/'+self.date+'/label.csv', skiprows=1, delimiter=',')
@@ -195,11 +195,11 @@ class ResultsClass():
         # import pdb; pdb.set_trace()
         np.savetxt('output.csv',np.vstack((grids.T, np.vstack((sorted_bias[0:min(grid_num, len(F1))], sorted_F1[0:min(grid_num, len(F1))])))),delimiter=',')
 
-        print("self.weight_list")
-        print("self.weight_list")
-        print(self.weight_list)
-        print("self.weight_list")
-        print("self.weight_list")
+        # print("self.weight_list")
+        # print("self.weight_list")
+        # print(self.weight_list)
+        # print("self.weight_list")
+        # print("self.weight_list")
 
         if len(self.weight_list) == 0:
             self.weight_list = sorted_weight[0,:]
@@ -257,7 +257,7 @@ class ResultsClass():
 
             self.min_list.append(F1)
             self.min_std_list.append(F1_std)
-            print(self.min_list)
+            # print(self.min_list)
 
             self.weight_list = np.vstack((self.weight_list,weights))
             self.TP_list = np.append(self.TP_list,TP)
@@ -285,8 +285,15 @@ class ResultsClass():
             nums, upper, bottom, mean = seed_shade(self.date,ion=ion)
             # import pdb; pdb.set_trace()
             ax.fill_between(nums,upper,bottom,facecolor='lightblue')
+        line, = ax.plot(np.arange(len(self.min_list))+1, self.min_list, 'ko-')
+        
+        # F1スコアの値をラベルとして追加
+        for i, txt in enumerate(self.min_list):
+            ax.annotate(f'{txt:.3f}', (i+1, self.min_list[i]), 
+                        xytext=(0, 5), textcoords='offset points',
+                        ha='center', va='bottom', fontsize=12, color='red')
         # ax.errorbar(np.arange(len(self.min_list))+1, self.min_list, fmt='ko-',yerr=self.min_std_list/np.sqrt(10))
-        ax.plot(np.arange(len(self.min_list))+1, self.min_list, 'ko-')
+        # ax.plot(np.arange(len(self.min_list))+1, self.min_list, 'ko-')
         ylim = ax.get_ylim()
         ax.xaxis.set_major_locator(ticker.MultipleLocator(1))
         ax.tick_params(labelsize=14)
@@ -331,7 +338,7 @@ class ResultsClass():
             os.makedirs('./process/'+self.date)
         if len(self.K_list) == 0:
             for i in range(len(self.parameters)-1):
-                print(i+1)
+                # print(i+1)
                 if not os.path.exists('./results/'+self.date+'/result'+str(i+1)+'.tsv'):
                     break
                 self.K_list.append(i+1)
@@ -359,7 +366,7 @@ class ResultsClass():
                 plt.close()
         else:
             for i in self.K_list:
-                print(i)
+                # print(i)
                 fig = self.dos_fig(i,save=True)
                 if layer:
                     ax = fig.axes[0]
@@ -439,7 +446,7 @@ def main_nbi(date, filename='nbi.txt'):
 
 if __name__ == '__main__':
     args = docopt(__doc__)
-    print( args )
+    # print( args )
     params_order = []
     # params_order = ['nel', 'Prad/Pinput', 'beta', 'rax_vmec', 'a99', 'CIII', 'CIV', 'OV', 'OVI', 'FeXVI', 'FIG', 'Pcc', 'Isat', 'reff@100eV', 'ne@100eV', 'Te@center', 'ne@center','RMP_LID']
     if args['--dos']:

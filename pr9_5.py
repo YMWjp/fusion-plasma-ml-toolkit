@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from numpy.core.function_base import linspace
 
-date = '20240812'
+date = '20240923'
 datapath = './results/'+date+'/dataset.csv'
 datapath2 = './results/'+date+'/label.csv'
 datapath3 = './results/'+date+'/result4.tsv'
@@ -118,7 +118,7 @@ np.where(results_header == 'F1score')[0][0]
 
 #カエルのここ
 # 使いたいものの列番号から1を引いた値
-shotdata_f1max = svm_result_data[515]
+shotdata_f1max = svm_result_data[424]
 target_number = 3
 
 weight_before = [float(s) for s in shotdata_f1max[1:len(use_parameter_list)+1]]
