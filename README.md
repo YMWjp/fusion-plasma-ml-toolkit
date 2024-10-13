@@ -16,6 +16,11 @@
 
 4.  →
     python pr9_5.py
+    → 少し修正したもの。
+    python pr9_5original.py
+    → オリジナルのもの。
+    python svm_result_analysis_and_plot.py
+    → 簡略化等で修正したもの。
 
 get_Isat を修正する
 
