@@ -26,7 +26,7 @@ get_Isat を修正する
 
 # Project Name
 
-**Radiation-Collapse Study with SVM Analysis**
+**Fusion Plasma Machine Learning Toolkit**
 
 ---
 
