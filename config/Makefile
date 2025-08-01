@@ -13,8 +13,8 @@ ifeq ($(words $(MAKECMDGOALS)),1)
 else
 	$(eval DATE := $(word 2,$(MAKECMDGOALS)))
 	@for i in $(RANGE); do \
-		echo "実行中: python src/preprocessing/pr8.py $(DATE) $$i"; \
-		python src/preprocessing/pr8.py $(DATE) $$i; \
+		echo "実行中: python src/preprocessing/svm_exhaustive_search.py $(DATE) $$i"; \
+		python src/preprocessing/svm_exhaustive_search.py $(DATE) $$i; \
 	done
 endif
 
@@ -24,8 +24,8 @@ ifeq ($(words $(MAKECMDGOALS)),1)
 	@echo "エラー: 日付が指定されていません。使用方法: make run_$* YYYYMMDD"
 else
 	$(eval DATE := $(word 2,$(MAKECMDGOALS)))
-	@echo "実行中: python src/preprocessing/pr8.py $(DATE) $*"
-	@python src/preprocessing/pr8.py $(DATE) $*
+	@echo "実行中: python src/preprocessing/svm_exhaustive_search.py $(DATE) $*"
+	@python src/preprocessing/svm_exhaustive_search.py $(DATE) $*
 endif
 
 %:

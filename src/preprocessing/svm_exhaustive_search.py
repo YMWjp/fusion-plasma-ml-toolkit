@@ -23,7 +23,7 @@ from time import time
 
 from src.analysis.svm_analysis import ExhaustiveSearch
 
-dataset_name = './makedata/dataset_25_7.csv'
+dataset_name = './data/makedata/dataset_25_7.csv'
 parameters = [
     'nel',
     'B', 

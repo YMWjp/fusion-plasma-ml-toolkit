@@ -5,11 +5,11 @@ import matplotlib.pyplot as plt
 from numpy.core.function_base import linspace
 
 date = '20240923'
-datapath = './results/'+date+'/dataset.csv'
-datapath2 = './results/'+date+'/label.csv'
-datapath3 = './results/'+date+'/result4.tsv'
-datapath4 = './results/'+date+'/parameter.csv'
-datapath5 = './results/'+date+'/dataset_minmax.csv'
+datapath = './outputs/results/'+date+'/dataset.csv'
+datapath2 = './outputs/results/'+date+'/label.csv'
+datapath3 = './outputs/results/'+date+'/result4.tsv'
+datapath4 = './outputs/results/'+date+'/parameter.csv'
+datapath5 = './outputs/results/'+date+'/dataset_minmax.csv'
 
 data = np.loadtxt(
     datapath, delimiter=','
