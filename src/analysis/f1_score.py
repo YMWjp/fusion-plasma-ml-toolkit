@@ -41,7 +41,7 @@ import matplotlib.ticker as ticker
 import matplotlib.cm as cm
 import mpl_toolkits.axes_grid1
 
-import common
+from src.utils import common
 
 class ResultsClass():
     def __init__(self, date, K_list, params_order=[],bolo_ch=[]):

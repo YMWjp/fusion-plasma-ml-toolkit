@@ -21,7 +21,7 @@ import matplotlib.pyplot as plt
 import sys
 from time import time
 
-from ES_SVM import ExhaustiveSearch
+from src.analysis.svm_analysis import ExhaustiveSearch
 
 dataset_name = './makedata/dataset_25_7.csv'
 parameters = [

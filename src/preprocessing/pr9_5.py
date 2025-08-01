@@ -1,5 +1,5 @@
 #1パラメータ分離させた領域図_rap影響評価に使用
-from common import names_dict
+from src.utils.common import names_dict
 import numpy as np
 import matplotlib.pyplot as plt
 from numpy.core.function_base import linspace

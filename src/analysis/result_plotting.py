@@ -1,4 +1,4 @@
-from common import names_dict
+from src.utils.common import names_dict
 import numpy as np
 import matplotlib.pyplot as plt
 from numpy.core.function_base import linspace
