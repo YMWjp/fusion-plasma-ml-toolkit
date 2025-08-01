@@ -1,0 +1,21 @@
+# Core scientific computing libraries
+numpy>=1.21.0
+pandas>=1.3.0
+scipy>=1.7.0
+
+# Machine learning
+scikit-learn>=1.0.0
+
+# Visualization
+matplotlib>=3.5.0
+japanize-matplotlib>=1.1.0
+
+# Parallel processing and utilities
+joblib>=1.1.0
+
+# Command line interface
+docopt>=0.6.2
+
+# Optional but recommended for development
+jupyter>=1.0.0
+seaborn>=0.11.0
