@@ -27,7 +27,6 @@ project_root/
 │   ├── svm_result_analysis_and_plot.py
 │   ├── pr8.py
 │   ├── pr9_5.py
-│   ├── pr9_5original.py
 │   ├── change_detection.py
 │   ├── F1score.py
 │   └── ES_SVM.py
@@ -120,7 +119,7 @@ Exhaustive Search（総当たり検索）を用いて SVM の最適なパラメ�
 **使用方法:**
 
 ```bash
-python pr8.py [date] [K(1~14)]
+python src/preprocessing/pr8.py [date] [K(1~14)]
 ```
 
 または
@@ -138,7 +137,7 @@ Exhaustive Search を実装したクラス`ExhaustiveSearch`を含むモジュ�
 **使用方法:**
 
 ```bash
-python ES_SVM.py [date] [seed]
+python src/analysis/svm_analysis.py [date] [seed]
 ```
 
 ### `F1score.py`
@@ -148,7 +147,7 @@ SVM の解析結果を F1 スコアで評価し、最適なモデルの選定を
 **使用方法:**
 
 ```bash
-python F1score.py [オプション]
+python src/analysis/f1_score.py [オプション]
 ```
 
 オプションには、DoS 図の描画、複数シードの処理、特定プロジェクト用の設定などがあります。詳細はスクリプト内のドキュメントを参照してください。
@@ -222,7 +221,7 @@ python change_detection.py
    Exhaustive Search を実行し、SVM モデルの最適パラメータを探索します。
 
    ```bash
-   python pr8.py [date] [K(1~14)]
+   python src/preprocessing/pr8.py [date] [K(1~14)]
    ```
 
    または
@@ -244,7 +243,7 @@ python change_detection.py
    F1 スコアを用いて解析結果を評価します。
 
    ```bash
-   python F1score.py [オプション]
+   python src/analysis/f1_score.py [オプション]
    ```
 
 7. **変化点検出**

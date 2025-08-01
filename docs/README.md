@@ -2,24 +2,24 @@
 
 1.  →
     cd makedata
-    python pr7_25.py
+    python data/makedata/pr7_25.py
 
 2.  →
-    python pr8.py [date] [K(1~14)]
+    python src/preprocessing/pr8.py [date] [K(1~14)]
 
     or
 
     make run [data] で一気に実行
 
 3.  →
-    python F1score.py -d [date]
+    python src/analysis/f1_score.py -d [date]
 
 4.  →
     python pr9_5.py
     → 少し修正したもの。
     python pr9_5original.py
     → オリジナルのもの。
-    python svm_result_analysis_and_plot.py
+    python src/analysis/result_plotting.py
     → 簡略化等で修正したもの。
 
 get_Isat を修正する
@@ -100,7 +100,7 @@ This script performs data collection and preprocessing. It retrieves necessary p
 
 ```bash
 cd makedata
-python pr7_25.py
+python data/makedata/pr7_25.py
 ```
 
 ### `makedata/makeimage.py`
@@ -111,7 +111,7 @@ This script visualizes each parameter for specific shot numbers (e.g., 115083) u
 
 ```bash
 cd makedata
-python makeimage.py
+python data/makedata/makeimage.py
 ```
 
 ### `makedata/makehysteresis.py`
@@ -122,7 +122,7 @@ This script generates hysteresis plots by detecting outliers and smoothing time-
 
 ```bash
 cd makedata
-python makehysteresis.py
+python data/makedata/makehysteresis.py
 ```
 
 ---
@@ -136,7 +136,7 @@ This is the main script for analyzing SVM results and plotting scatter diagrams.
 **Usage:**
 
 ```bash
-python svm_result_analysis_and_plot.py
+python src/analysis/result_plotting.py
 ```
 
 ### `pr8.py`
@@ -146,7 +146,7 @@ This script uses Exhaustive Search to explore optimal SVM parameters. It perform
 **Usage:**
 
 ```bash
-python pr8.py [date] [K(1~14)]
+python src/preprocessing/pr8.py [date] [K(1~14)]
 ```
 
 or
@@ -164,7 +164,7 @@ This module includes the class `ExhaustiveSearch`, which implements Exhaustive S
 **Usage:**
 
 ```bash
-python ES_SVM.py [date] [seed]
+python src/analysis/svm_analysis.py [date] [seed]
 ```
 
 ### `F1score.py`
@@ -174,7 +174,7 @@ This script evaluates SVM analysis results using the F1 score and assists in sel
 **Usage:**
 
 ```bash
-python F1score.py [options]
+python src/analysis/f1_score.py [options]
 ```
 
 Options include drawing DoS diagrams, processing multiple seeds, and settings for specific projects. Please refer to the documentation within the script for details.
@@ -186,7 +186,7 @@ This script detects change points in the data for selected shot numbers and iden
 **Usage:**
 
 ```bash
-python change_detection.py
+python src/detection/change_detection.py
 ```
 
 ---
@@ -231,7 +231,7 @@ This file lists the Python packages required for the project.
 
    ```bash
    cd makedata
-   python pr7_25.py
+   python data/makedata/pr7_25.py
    ```
 
 3. **Data Visualization**
@@ -239,8 +239,8 @@ This file lists the Python packages required for the project.
    Generate images using the collected data.
 
    ```bash
-   python makeimage.py
-   python makehysteresis.py
+   python data/makedata/makeimage.py
+   python data/makedata/makehysteresis.py
    ```
 
 4. **SVM Analysis**
@@ -248,7 +248,7 @@ This file lists the Python packages required for the project.
    Execute Exhaustive Search to explore optimal parameters for the SVM model.
 
    ```bash
-   python pr8.py [date] [K(1~14)]
+   python src/preprocessing/pr8.py [date] [K(1~14)]
    ```
 
    or
@@ -262,7 +262,7 @@ This file lists the Python packages required for the project.
    Analyze SVM results and generate scatter plots.
 
    ```bash
-   python svm_result_analysis_and_plot.py
+   python src/analysis/result_plotting.py
    ```
 
 6. **Evaluation**
@@ -270,7 +270,7 @@ This file lists the Python packages required for the project.
    Evaluate analysis results using the F1 score.
 
    ```bash
-   python F1score.py [options]
+   python src/analysis/f1_score.py [options]
    ```
 
 7. **Change Point Detection**
@@ -278,7 +278,7 @@ This file lists the Python packages required for the project.
    Execute anomaly detection in the data.
 
    ```bash
-   python change_detection.py
+   python src/detection/change_detection.py
    ```
 
 ---
