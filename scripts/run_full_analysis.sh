@@ -11,9 +11,9 @@ echo "=== 核融合プラズマML解析開始 (日付: $DATE) ==="
 
 # 1. データ収集
 echo "1. データ収集中..."
-cd data/makedata
+cd ../data/makedata
 python plasma_data_collector.py
-cd ../..
+cd ../../
 
 # 2. SVM解析（全パラメータ）
 echo "2. SVM解析実行中..."

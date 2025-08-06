@@ -1,5 +1,9 @@
 import datetime
 import json
+import argparse
+from scipy import signal
+from scipy.ndimage import gaussian_filter1d
+import tempfile
 
 # from getfile_dat import getfile_dat
 from getfile_http_2024 import getdata
@@ -68,7 +72,7 @@ class DetachData(CalcMPEXP):
         # 出力用にラベルと変数名を結びつける辞書を用意しておく
         self.output_dict = {}
 
-    def main(self, shotNO):
+    def main(self, shotNO, config=None):
         getfile = self.getfile_dat()  # データをサーバから取得
         if getfile == -1:
             # 通常
@@ -121,7 +125,7 @@ class DetachData(CalcMPEXP):
         # get_soxmos(self, shotNO)
 
         # ラベル付けをする
-        self.def_types(shotNO)
+        self.def_types(shotNO, config)
 
         return 1
 
@@ -138,21 +142,60 @@ class DetachData(CalcMPEXP):
     
     
 
-    def def_types(self, shotNO):
+    def def_types(self, shotNO, config=None):
         """各時刻のラベルを self.type_list に格納する"""
+        if config is None:
+            with open("config.json", "r") as config_file:
+                config = json.load(config_file)
+        
+        detection_mode = config.get("detection_mode", "manual")
+        
+        if detection_mode == "manual":
+            return self._manual_labeling(shotNO, config)
+        elif detection_mode == "automatic":
+            return self._automatic_labeling(shotNO, config)
+        else:
+            raise ValueError(f"Unknown detection mode: {detection_mode}")
 
-        def get_egdata(shotNO, diagname, valname):
-            """データ取得と整形"""
-            getdata(shotNO, diagname, subshotNO=1)
-            filename = "{0}@{1:d}.dat".format(diagname, shotNO)
-            egfile = egdb2d(filename)
-            egfile.readFile()
-            time = np.array(egfile.dimdata)
-            data = np.array(egfile.data[egfile.valname2idx(valname)])
-            return time, data
+    def _get_egdata(self, shotNO, diagname, valname):
+        """データ取得と整形"""
+        getdata(shotNO, diagname, subshotNO=1)
+        filename = "{0}@{1:d}.dat".format(diagname, shotNO)
+        egfile = egdb2d(filename)
+        egfile.readFile()
+        time = np.array(egfile.dimdata)
+        data = np.array(egfile.data[egfile.valname2idx(valname)])
+        return time, data
 
+    def _apply_labeling(self, start_index, config):
+        """ラベリングを適用する共通関数"""
+        labeling_config = config.get("labeling", {})
+        pre_range = labeling_config.get("pre_range", 15)
+        transition_range = labeling_config.get("transition_range", 5)
+        post_range = labeling_config.get("post_range", 15)
+        pre_label = labeling_config.get("pre_label", -1)
+        transition_label = labeling_config.get("transition_label", 0)
+        post_label = labeling_config.get("post_label", 1)
+        
+        self.type_list = np.zeros_like(self.time_list)
+        
+        # 境界チェックを追加
+        max_index = len(self.time_list) - 1
+        pre_start = max(0, start_index - pre_range)
+        pre_end = max(0, start_index - transition_range)
+        trans_start = max(0, start_index - transition_range)
+        trans_end = min(max_index + 1, start_index + transition_range)
+        post_start = min(max_index + 1, start_index + transition_range)
+        post_end = min(max_index + 1, start_index + post_range)
+        
+        self.type_list[pre_start:pre_end] = pre_label
+        self.type_list[trans_start:trans_end] = transition_label
+        self.type_list[post_start:post_end] = post_label
+
+    def _manual_labeling(self, shotNO, config):
+        """手動ラベリング（クリックベース）"""
         # データ取得
-        wp_time, wp_data = get_egdata(shotNO, "wp", "Wp")
+        wp_time, wp_data = self._get_egdata(shotNO, "wp", "Wp")
         isat7L_time = self.time_list
         isat7L_data = self.Isat
 
@@ -171,20 +214,141 @@ class DetachData(CalcMPEXP):
         ax2.legend()
         
         # グラフのタイトル
-        fig.suptitle(f'Shot Number: {shotNO}')
+        fig.suptitle(f'Shot Number: {shotNO} (Manual Mode - Click to select detachment point)')
 
         def onclick(event):
             if event.inaxes:
                 click_time = event.xdata
                 start_index = (np.abs(isat7L_time - click_time)).argmin()
-                self.type_list = np.zeros_like(self.time_list)
-                # 選択した点を中心にラベルを設定
-                self.type_list[start_index-15:start_index-5] = -1
-                self.type_list[start_index-5:start_index+5] = 0
-                self.type_list[start_index+5:start_index+15] = 1
+                self._apply_labeling(start_index, config)
                 plt.close()
 
         fig.canvas.mpl_connect('button_press_event', onclick)
+        plt.show()
+
+        return 1
+
+    def _automatic_labeling(self, shotNO, config):
+        """自動ラベリング（アルゴリズムベース）"""
+        # データ取得
+        wp_time, wp_data = self._get_egdata(shotNO, "wp", "Wp")
+        isat7L_time = self.time_list
+        isat7L_data = self.Isat
+        
+        # アルゴリズム設定
+        auto_config = config.get("automatic_detection", {})
+        method = auto_config.get("method", "derivative")
+        
+        if method == "derivative":
+            detachment_index = self._detect_by_derivative(isat7L_data, auto_config)
+        elif method == "threshold":
+            detachment_index = self._detect_by_threshold(isat7L_data, auto_config)
+        elif method == "peak":
+            detachment_index = self._detect_by_peak(isat7L_data, auto_config)
+        else:
+            raise ValueError(f"Unknown detection method: {method}")
+        
+        if detachment_index is None:
+            print(f"Warning: Could not detect detachment point for shot {shotNO}")
+            self.type_list = np.zeros_like(self.time_list)
+            return -1
+        
+        # ラベルを適用
+        self._apply_labeling(detachment_index, config)
+        
+        # 結果を可視化（オプション）
+        if auto_config.get("show_result", True):
+            self._visualize_automatic_detection(shotNO, wp_time, wp_data, 
+                                               isat7L_time, isat7L_data, detachment_index)
+        
+        return 1
+
+    def _detect_by_derivative(self, data, config):
+        """微分ベースの検出"""
+        sigma = config.get("smoothing_sigma", 2.0)
+        threshold_percentile = config.get("threshold_percentile", 90)
+        
+        # データを平滑化
+        smoothed_data = gaussian_filter1d(data, sigma=sigma)
+        
+        # 微分を計算
+        derivative = np.gradient(smoothed_data)
+        
+        # 負の微分（降下）を検出
+        negative_derivative = -derivative
+        threshold = np.percentile(negative_derivative, threshold_percentile)
+        
+        # 閾値を超える点を検出
+        candidates = np.where(negative_derivative > threshold)[0]
+        
+        if len(candidates) == 0:
+            return None
+        
+        # 最初の候補点を選択
+        return candidates[0]
+
+    def _detect_by_threshold(self, data, config):
+        """閾値ベースの検出"""
+        threshold_percentile = config.get("threshold_percentile", 50)
+        
+        # データの最大値の一定割合を閾値とする
+        max_val = np.max(data)
+        threshold = max_val * (threshold_percentile / 100.0)
+        
+        # 閾値を下回る最初の点を検出
+        below_threshold = np.where(data < threshold)[0]
+        
+        if len(below_threshold) == 0:
+            return None
+        
+        return below_threshold[0]
+
+    def _detect_by_peak(self, data, config):
+        """ピーク検出ベースの検出"""
+        min_prominence = config.get("min_prominence", 0.1)
+        
+        # ピークを検出（負のデータのピーク = 元データの谷）
+        peaks, _ = signal.find_peaks(-data, prominence=min_prominence)
+        
+        if len(peaks) == 0:
+            return None
+        
+        # 最初のピーク（谷）を選択
+        return peaks[0]
+
+    def _visualize_automatic_detection(self, shotNO, wp_time, wp_data, 
+                                     isat7L_time, isat7L_data, detachment_index):
+        """自動検出結果の可視化"""
+        fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True, figsize=(12, 8))
+        
+        # Wpのグラフ
+        ax1.plot(wp_time, wp_data, label='Wp', color='orange')
+        ax1.set_xlabel('Time')
+        ax1.set_ylabel('Wp')
+        ax1.legend()
+
+        # Isat_7Lのグラフと検出点
+        ax2.plot(isat7L_time, isat7L_data, label='Isat_7L')
+        ax2.axvline(isat7L_time[detachment_index], color='red', linestyle='--', 
+                   label=f'Detected detachment at t={isat7L_time[detachment_index]:.3f}s')
+        ax2.set_ylabel('Isat_7L')
+        ax2.legend()
+        
+        # ラベルの色分け表示
+        for i, label_val in enumerate(self.type_list):
+            if label_val == -1:
+                ax2.axvspan(isat7L_time[i], isat7L_time[min(i+1, len(isat7L_time)-1)], 
+                           alpha=0.3, color='blue', label='Pre-detachment' if i == 0 else "")
+            elif label_val == 0:
+                ax2.axvspan(isat7L_time[i], isat7L_time[min(i+1, len(isat7L_time)-1)], 
+                           alpha=0.3, color='yellow', label='Transition' if i == 0 else "")
+            elif label_val == 1:
+                ax2.axvspan(isat7L_time[i], isat7L_time[min(i+1, len(isat7L_time)-1)], 
+                           alpha=0.3, color='red', label='Post-detachment' if i == 0 else "")
+        
+        # グラフのタイトル
+        fig.suptitle(f'Shot Number: {shotNO} (Automatic Detection)')
+        plt.tight_layout()
         plt.show()
 
         return 1
@@ -317,14 +481,27 @@ class DetachData(CalcMPEXP):
     datapath = "./egdata/"
 
 
-def main(savename="dataset_25_7.csv", labelname="labels.csv", ion=None):
+def main(savename="dataset_25_7.csv", labelname="labels.csv", ion=None, 
+         detection_mode=None, config_file="config.json"):
     """main関数の説明
     1放電ごとに DetachData インスタンスを作り，
     CSVファイルに書き込んでいく
+    
+    Args:
+        savename: 出力CSVファイル名
+        labelname: ラベルファイル名
+        ion: 未使用（後方互換性のため残存）
+        detection_mode: 検出モード ('manual' or 'automatic')
+        config_file: 設定ファイルのパス
     """
 
-    with open("config.json", "r") as config_file:
-        config = json.load(config_file)
+    with open(config_file, "r") as f:
+        config = json.load(f)
+    
+    # コマンドライン引数で検出モードが指定された場合は上書き
+    if detection_mode is not None:
+        config["detection_mode"] = detection_mode
+        print(f"Detection mode set to: {detection_mode}")
 
     shotNOs = np.genfromtxt(
         labelname, delimiter=",", skip_header=1, usecols=0, dtype=int
@@ -356,7 +533,7 @@ def main(savename="dataset_25_7.csv", labelname="labels.csv", ion=None):
             savename=savename,
         )
         nel_data.remove_files()  # 古いegデータがあったら一旦削除
-        main_return = nel_data.main(shotNO)
+        main_return = nel_data.main(shotNO, config)
         if main_return == -1:
             nel_data.remove_files()
             continue
@@ -372,5 +549,61 @@ def main(savename="dataset_25_7.csv", labelname="labels.csv", ion=None):
     return
 
 
+def parse_arguments():
+    """コマンドライン引数を解析"""
+    parser = argparse.ArgumentParser(description='Plasma Data Collector')
+    parser.add_argument('--mode', '-m', 
+                       choices=['manual', 'automatic'], 
+                       help='Detection mode: manual (click-based) or automatic (algorithm-based)')
+    parser.add_argument('--savename', '-s', 
+                       default='dataset_25_7.csv',
+                       help='Output CSV filename')
+    parser.add_argument('--labelname', '-l',
+                       default='labels.csv', 
+                       help='Label CSV filename')
+    parser.add_argument('--config', '-c',
+                       default='config.json',
+                       help='Configuration file path')
+    parser.add_argument('--method',
+                       choices=['derivative', 'threshold', 'peak'],
+                       help='Automatic detection method (only for automatic mode)')
+    return parser.parse_args()
+
 if __name__ == "__main__":
-    main()
+    args = parse_arguments()
+    
+    # 設定ファイルを読み込んで、コマンドライン引数で上書き
+    detection_mode = args.mode
+    
+    # アルゴリズムメソッドが指定された場合は自動的にautomaticモードに設定
+    if args.method and not detection_mode:
+        detection_mode = 'automatic'
+        print(f"Detection method '{args.method}' specified, setting mode to 'automatic'")
+    
+    # methodが指定された場合は設定ファイルを一時的に更新
+    if args.method:
+        
+        # 一時的な設定ファイルを作成
+        with open(args.config, 'r') as f:
+            config = json.load(f)
+        
+        config['automatic_detection']['method'] = args.method
+        
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
+            json.dump(config, f, indent=2)
+            temp_config_path = f.name
+        
+        try:
+            main(savename=args.savename, 
+                 labelname=args.labelname,
+                 detection_mode=detection_mode,
+                 config_file=temp_config_path)
+        finally:
+            # 一時ファイルを削除
+            import os
+            os.unlink(temp_config_path)
+    else:
+        main(savename=args.savename, 
+             labelname=args.labelname,
+             detection_mode=detection_mode,
+             config_file=args.config)
