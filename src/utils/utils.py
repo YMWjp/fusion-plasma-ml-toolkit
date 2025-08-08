@@ -1,11 +1,14 @@
-# utils.py
+# src/utils/utils.py
 from pathlib import Path
 from datetime import datetime
 from zoneinfo import ZoneInfo
+from typing import Sequence, Iterable
 import csv
-from src.utils.path import DATASETS_DIR, LOGS_DIR
+import numpy as np
+from src.utils.paths import DATASETS_DIR, LOGS_DIR
 
-def write_csv_header(filepath: Path | str, header: list[str], delimiter: str = ',', overwrite: bool = False) -> None:
+def write_csv_header(filepath: Path | str, header: Sequence[str],
+                     delimiter: str = ',', overwrite: bool = False) -> None:
     path = Path(filepath)
     path.parent.mkdir(parents=True, exist_ok=True)
     if path.exists() and not overwrite:
@@ -25,3 +28,10 @@ def log_error_shot(shot_no: int, log_filename: str = "errorshot.txt") -> Path:
     with log_path.open(mode='a', encoding='utf-8', newline='') as f:
         f.write(f"{now:%Y-%m-%d}  shotNO:{shot_no}\n")
     return log_path
+
+def append_rows_to_csv(filepath: Path | str, rows: np.ndarray | Iterable[Iterable], *,
+                       delimiter: str = ',', floatfmt: str = '%.10e') -> None:
+    path = Path(filepath)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open('a', encoding='utf-8', newline='') as f:
+        np.savetxt(f, rows, delimiter=delimiter, fmt=floatfmt)
