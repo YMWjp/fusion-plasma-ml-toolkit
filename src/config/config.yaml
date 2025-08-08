@@ -1,0 +1,17 @@
+# プラズマデータ処理設定
+files:
+  output_dataset: "dataset_25_7.csv"
+  error_log: "errorshot.txt"
+
+# 処理設定
+processing:
+  parallel_workers: 4 # 並列処理数
+  temp_dir: "./temp/" # 一時ディレクトリ
+  cleanup_files: true # 処理後クリーンアップ
+  timeout_seconds: 300 # タイムアウト
+
+# ログ設定
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(levelname)s - %(message)s"
+  file: "processing.log"

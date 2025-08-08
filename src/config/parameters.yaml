@@ -1,0 +1,66 @@
+basic_info_for_header:
+  # 基本情報
+  - shotNO
+  - times
+  - types
+
+parameters:
+  # プラズマ基本パラメータ
+  - nel # 電子密度
+  - B # 磁場
+
+  # 加熱パワー
+  - Pech # ECH加熱
+  - Pnbi-tan # NBI tangential
+  - Pnbi-perp # NBI perpendicular
+  - Pinput # 総入力パワー
+
+  # 放射・エネルギー
+  - Prad # 放射パワー
+  - Prad/Pinput # 放射パワー比
+  - Wp # 蓄積エネルギー
+  - beta # ベータ値
+
+  # 幾何パラメータ
+  - Rax # 磁気軸位置
+  - rax_vmec # VMEC磁気軸
+  - a99 # 小半径
+  # - delta_sh # シフト？
+
+  # 不純物
+  - D/(H+D) # 重水素比
+  - CIII # 炭素3価
+  - CIV # 炭素4価
+  - OV # 酸素5価
+  - OVI # 酸素6価
+  - FeXVI # 鉄16価
+
+  # その他
+  - Ip # プラズマ電流
+  # - FIG # 不明な指標
+  # - Pcc # 不明な指標
+  - Isat@4R # 飽和電流4R
+  - Isat@6L # 飽和電流6L
+  - Isat@7L # 飽和電流7L
+  - reff@100eV # 100eV位置
+  - ne@100eV # 100eV電子密度
+  - dVdreff@100eV # 体積微分
+  - Te@center # 中心電子温度
+  - Te@edge # 周辺電子温度
+  - ne@center # 中心電子密度
+  # - ne_peak # ピーク密度？
+  - RMP_LID # RMP制御
+  - SDLloop_dPhi # SDLループ磁束
+  - SDLloop_dPhi_ext # SDLループ磁束(外部)
+  - SDLloop_dTheta # SDLループ角度
+
+
+  # コメントアウトされていたその他のパラメータ
+  # - beta_e # 電子ベータ？
+  # - collision # 衝突度？
+  # - beta0 # 初期ベータ？
+  # - fig6I # 不明
+  # - pcc3O # 不明
+  # - fig/pcc # 不明
+  # - ne_soxmos # 不明
+  # - ar_soxmos # 不明
