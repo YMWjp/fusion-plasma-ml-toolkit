@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import numpy as np
+from tqdm import tqdm
 
 from src.config.settings import get_basic_info_for_header, get_parameters, get_shot_numbers, load_config
 from src.domain.labeling.detachment import apply_window_labels, label_by_derivative
@@ -335,8 +336,9 @@ def run_native_pipeline(*, detection_mode: str | None = None, method: str | None
     write_csv_header(out_path, headers, overwrite=True)
 
     shots = get_shot_numbers()
-
-    for shot in shots:
+    pbar = tqdm(shots, desc="Processing shots", unit="shot")
+    for shot in pbar:
+        pbar.set_postfix_str(f"shot={int(shot)}")
         # 必要ファイルが存在しない/失敗しても個別スキップ
         try:
             rows = build_one_shot_rows(int(shot), headers, detection_mode=detection_mode, method=method)

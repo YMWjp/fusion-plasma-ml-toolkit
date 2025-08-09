@@ -16,6 +16,9 @@ joblib>=1.1.0
 # Command line interface
 docopt>=0.6.2
 
+# Progress bar
+tqdm>=4.66.0
+
 # Optional but recommended for development
 jupyter>=1.0.0
 seaborn>=0.11.0
