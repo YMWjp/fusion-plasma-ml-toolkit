@@ -1,6 +1,9 @@
 from __future__ import annotations
-import numpy as np
+
 from functools import lru_cache
+
+import numpy as np
+
 from src.utils.paths import EXPERIMENT_LOG_CSV
 
 SHOT_COL = 2

@@ -1,5 +1,7 @@
 from __future__ import annotations
+
 import numpy as np
+
 
 def align_sdl_to_times(sdl_matrix: np.ndarray, target_times: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """

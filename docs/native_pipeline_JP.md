@@ -6,7 +6,7 @@
 
 ```mermaid
 graph TD
-  A["Start (src.main)\n--engine native"] --> B["load_config() & headers"]
+  A["Start (src.main)"] --> B["load_config() & headers"]
   B --> C["write_csv_header(out.csv)"]
   C --> D["for each shot in shot_numbers.csv"]
 
@@ -21,7 +21,7 @@ graph TD
     E7 --> E8["Impurity & Ha: imp02, ha1, ha3\n- O/C/Fe系列 + D/(H+D) ゲイン補正"]
     E8 --> E9["TsmapCalib (簡易)\n- reff@100eV, ne@100eV, dVdreff@100eV\n- Te@center, ne@center\n- Te@edge は簡易(要改善)"]
     E9 --> E10["Isat channels: DivIis\n- gdn: 自動抽出→ Iis_{ch}@gdn 補間\n- 7L外れ値補正"]
-    E10 --> E11["Labeling\n- automatic(derivative/threshold/peak)\n- apply window: pre/transition/post"]
+    E10 --> E11["Labeling\n- automatic (fixed: derivative)\n- apply window: pre/transition/post"]
     E11 --> E12["RMP & SDL\n- RMP_LID(bt, flag)\n- SDL: 最近傍時刻に合わせる"]
     E12 --> E13["mapping を header順に整形\n→ rows"]
     E13 --> E14["append_rows_to_csv(out.csv)"]
@@ -33,11 +33,10 @@ graph TD
 
 ## 実行方法
 
-- ネイティブ（推奨）
-  - 自動検出（微分法）: `python -m src.main --engine native --mode automatic --method derivative`
-  - 閾値/ピーク法: `--method threshold` / `--method peak`
-- レガシー互換（必要時）
-  - `python -m src.main --engine legacy --mode automatic --method derivative`
+- 基本: `python -m src.main`
+- 手動/自動の切替のみ:
+  - 手動タイミング指定: `python -m src.main --mode manual`
+  - 自動タイミング検出（固定手法 = 微分法）: `python -m src.main --mode automatic`
 
 ## レイヤと責務
 
@@ -47,10 +46,10 @@ graph TD
   - `repositories/sdl_repo.py`: SDL ファイル読み込み（レガシー場所へのフォールバック対応）。
 - `src/domain`
   - `params/isat.py`: Isat 取得・7L 外れ値補正。
-  - `labeling/detachment.py`: 自動検出（derivative/threshold/peak）とラベル窓の適用。
+  - `labeling/detachment.py`: 自動検出（現在は微分法のみ使用）とラベル窓の適用。
   - `params/sdl.py`, `params/rmp.py`: SDL 整列・RMP 算出。
 - `src/application`
-  - `native_pipeline.py`: 1 ショットのフルパイプライン（取得 → 補間 → 物理量算出 → ラベリング →CSV）。
+  - `native_pipeline.py`: 1 ショットのフルパイプライン（取得 → 補間 → 物理量算出 → ラベリング → CSV）。
   - `build_dataset.py`: 既存ユースケースの拡張（RMP/SDL/Isat 等）。
 - `src/config`
   - `parameters.yaml`: 出力ヘッダ。`headers = basic_info_for_header + parameters`。
@@ -83,7 +82,7 @@ graph TD
   - `DivIis_tor_sum@shot.dat` から `gdn:` 行を自動抽出し、`Iis_{ch}@gdn` を補間。
   - `7L` は外れ値補正（閾値置換＋前値ホールド近似）。
 - ラベリング
-  - `--mode automatic` 時に `derivative/threshold/peak` を選択。
+  - `--mode automatic` 時は「微分法」のみを使用（手法選択は不要）。
   - `apply_window_labels` で pre/transition/post 区間を付与。
 - RMP/SDL
   - `RMP_LID = calculate_rmp_lid(Bt, flag)`; SDL は最近傍サンプル整列。

@@ -1,7 +1,11 @@
 from __future__ import annotations
-import numpy as np
+
 from pathlib import Path
+
+import numpy as np
+
 from src.utils.paths import SDL_LOOP_DATA_DIR
+
 
 def load_sdl_file(shot_no: int) -> np.ndarray:
     """Phieff{shot}.dat を読み (skiprows=1, delimiter=','), shape=(N, M)"""

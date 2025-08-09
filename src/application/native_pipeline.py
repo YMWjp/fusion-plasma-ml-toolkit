@@ -1,24 +1,19 @@
 from __future__ import annotations
 
-from typing import Optional
 import numpy as np
 
-from src.config.settings import (
-    get_shot_numbers, get_parameters, get_basic_info_for_header, load_config
-)
-from src.utils.utils import write_csv_header, append_rows_to_csv
-from src.utils.paths import DATASETS_DIR
-
-from src.infrastructure.clients.lhd_api import ensure_eg_files
-from src.infrastructure.parsers.egdb import Eg2D
-from src.infrastructure.parsers.eg3d import TsmapCalib
-from src.infrastructure.repositories.rmp_repo import load_rmp_flag_from_csv
-from src.infrastructure.repositories.sdl_repo import load_sdl_file
+from src.config.settings import get_basic_info_for_header, get_parameters, get_shot_numbers, load_config
+from src.domain.labeling.detachment import apply_window_labels, label_by_derivative
+from src.domain.params.isat import load_isat_series, repair_isat_7l_outliers
 from src.domain.params.rmp import calculate_rmp_lid
 from src.domain.params.sdl import align_sdl_to_times
-from src.domain.params.isat import load_isat_series, repair_isat_7l_outliers
-from src.domain.labeling.detachment import label_by_derivative, apply_window_labels
-
+from src.infrastructure.clients.lhd_api import ensure_eg_files
+from src.infrastructure.parsers.eg3d import TsmapCalib
+from src.infrastructure.parsers.egdb import Eg2D
+from src.infrastructure.repositories.rmp_repo import load_rmp_flag_from_csv
+from src.infrastructure.repositories.sdl_repo import load_sdl_file
+from src.utils.paths import DATASETS_DIR
+from src.utils.utils import write_csv_header
 
 NE_LENGTH = 1.86  # 既存コードの規格化長
 DT = 0.01         # 10ms サンプリング
@@ -320,7 +315,7 @@ def build_one_shot_rows(shot_no: int, headers: list[str], *,
     return arr
 
 
-def run_native_pipeline(*, detection_mode: Optional[str] = None, method: Optional[str] = None) -> None:
+def run_native_pipeline(*, detection_mode: str | None = None, method: str | None = None) -> None:
     headers = get_basic_info_for_header() + get_parameters()
     cfg = load_config()
     out_name = cfg['files']['output_dataset']
@@ -328,14 +323,16 @@ def run_native_pipeline(*, detection_mode: Optional[str] = None, method: Optiona
     write_csv_header(out_path, headers, overwrite=True)
 
     shots = get_shot_numbers()
-    for shot in shots:
-        # 必要ファイルが存在しない/失敗しても個別スキップ
-        try:
-            rows = build_one_shot_rows(int(shot), headers, detection_mode=detection_mode, method=method)
-            if rows is not None:
-                append_rows_to_csv(out_path, rows)
-        except Exception:
-            # 失敗ショットはログへ（既存の log_error_shot を使うほどではないため簡易無視）
-            continue
+    print(shots)
+
+    # for shot in shots:
+    #     # 必要ファイルが存在しない/失敗しても個別スキップ
+    #     try:
+    #         rows = build_one_shot_rows(int(shot), headers, detection_mode=detection_mode, method=method)
+    #         if rows is not None:
+    #             append_rows_to_csv(out_path, rows)
+    #     except Exception:
+    #         # 失敗ショットはログへ（既存の log_error_shot を使うほどではないため簡易無視）
+    #         continue
 
 

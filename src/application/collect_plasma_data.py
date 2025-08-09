@@ -1,13 +1,13 @@
 from __future__ import annotations
 
-from pathlib import Path
-from typing import Optional
+import importlib
 import json
-import tempfile
 import os
 import sys
-import importlib
-from src.config.settings import get_parameters, get_basic_info_for_header
+import tempfile
+from pathlib import Path
+
+from src.config.settings import get_basic_info_for_header, get_parameters
 
 
 def _repo_root() -> Path:
@@ -30,8 +30,8 @@ def _resolve_paths(output_filename: str) -> tuple[Path, Path, Path, Path]:
 
 def run_plasma_collection(*,
                           output_filename: str,
-                          detection_mode: Optional[str] = None,
-                          method: Optional[str] = None) -> None:
+                          detection_mode: str | None = None,
+                          method: str | None = None) -> None:
     """
     既存の data/makedata/plasma_data_collector.py を呼び出し、
     src 配下の入出力ファイルで処理を実行するラッパー。

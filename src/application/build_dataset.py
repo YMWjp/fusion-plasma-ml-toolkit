@@ -1,19 +1,22 @@
 from __future__ import annotations
-import numpy as np
+
 from pathlib import Path
-from src.infrastructure.repositories.rmp_repo import load_rmp_flag_from_csv
-from src.domain.params.rmp import calculate_rmp_lid
-from src.utils.utils import append_rows_to_csv, log_error_shot
-from src.infrastructure.repositories.sdl_repo import load_sdl_file
-from src.domain.params.sdl import align_sdl_to_times
+
+import numpy as np
 from src.domain.dataset_builder import build_rows_by_header
+from src.domain.labeling.detachment import (
+    apply_window_labels,
+    label_by_derivative,
+)
+from src.domain.params.isat import load_isat_series, repair_isat_7l_outliers
+from src.domain.params.rmp import calculate_rmp_lid
+from src.domain.params.sdl import align_sdl_to_times
 from src.infrastructure.clients.lhd_api import ensure_eg_files
 from src.infrastructure.parsers.egdb import Eg2D
-from src.domain.params.isat import load_isat_series, repair_isat_7l_outliers
-from src.domain.labeling.detachment import (
-    label_by_derivative,
-    apply_window_labels,
-)
+from src.infrastructure.repositories.rmp_repo import load_rmp_flag_from_csv
+from src.infrastructure.repositories.sdl_repo import load_sdl_file
+from src.utils.utils import append_rows_to_csv, log_error_shot
+
 
 def process_one_shot(*, shot_no: int, bt: float, time_list: np.ndarray,
                      mapping: dict[str, np.ndarray], header: list[str],

@@ -1,11 +1,14 @@
 # src/utils/utils.py
-from pathlib import Path
-from datetime import datetime
-from zoneinfo import ZoneInfo
-from typing import Sequence, Iterable
 import csv
+from collections.abc import Iterable, Sequence
+from datetime import datetime
+from pathlib import Path
+from zoneinfo import ZoneInfo
+
 import numpy as np
+
 from src.utils.paths import DATASETS_DIR, LOGS_DIR
+
 
 def write_csv_header(filepath: Path | str, header: Sequence[str],
                      delimiter: str = ',', overwrite: bool = False) -> None:

@@ -1,0 +1,19 @@
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = [
+  "E",  # pycodestyle
+  "F",  # pyflakes
+  "I",  # isort (import order)
+  "UP", # pyupgrade
+]
+exclude = ["data", "outputs"]
+
+[tool.ruff.format]
+# フォーマッタ設定（必要時に `ruff format` を使用）
+quote-style = "preserve"
+indent-style = "space"
+line-ending = "lf"
+skip-magic-trailing-comma = false
+

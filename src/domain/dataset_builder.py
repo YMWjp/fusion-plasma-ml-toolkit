@@ -1,5 +1,7 @@
 from __future__ import annotations
+
 import numpy as np
+
 
 def build_rows_by_header(header: list[str], mapping: dict[str, np.ndarray]) -> np.ndarray:
     """

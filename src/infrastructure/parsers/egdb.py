@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+
 import numpy as np
 from scipy import interpolate
 
@@ -19,7 +20,7 @@ class Eg2D:
 
     def _read_file(self) -> None:
         lines = self.path.read_text(encoding='utf-8').splitlines()
-        dimno = 0
+        # dimno = 0
         parsing_data = False
         # raw lines cache for out-of-band markers (e.g., gdn: ...)
         self._raw_lines = lines
@@ -29,8 +30,8 @@ class Eg2D:
             if line.startswith('#'):
                 content = line[1:].strip()
                 tag = content.split('=')[0].strip().upper()
-                if tag == 'DIMNO':
-                    dimno = int(content.split('=')[1])
+                # if tag == 'DIMNO':
+                #     dimno = int(content.split('=')[1])
                 if tag == 'VALNO':
                     valno = int(content.split('=')[1])
                     self.data = [[] for _ in range(valno)]

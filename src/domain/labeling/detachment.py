@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-import numpy as np
-from scipy.ndimage import gaussian_filter1d
-from scipy import signal
 import matplotlib.pyplot as plt
+import numpy as np
+from scipy import signal
+from scipy.ndimage import gaussian_filter1d
 
 
 def label_by_derivative(isat: np.ndarray, *, sigma: float, threshold_percentile: float) -> int | None:

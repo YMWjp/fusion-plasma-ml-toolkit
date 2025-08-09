@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+
 import numpy as np
 from scipy import interpolate
 
@@ -27,15 +28,15 @@ class Eg3D:
     def _read_file(self) -> None:
         lines = self.path.read_text(encoding='utf-8').splitlines()
         parsing_data = False
-        dimno = 0
+        # dimno = 0
         for line in lines:
             if not line:
                 continue
             if line.startswith('#'):
                 content = line[1:].strip()
                 key = content.split('=')[0].strip().upper()
-                if key == 'DIMNO':
-                    dimno = int(content.split('=')[1])
+                # if key == 'DIMNO':
+                #     dimno = int(content.split('=')[1])
                 if key == 'DIMSIZE':
                     parts = [p.strip() for p in content.split('=')[1].split(',')]
                     self._dim_sizes = (int(parts[0]), int(parts[1]))
