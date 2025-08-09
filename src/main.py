@@ -13,6 +13,8 @@ def main() -> None:
     output_dataset = config['files']['output_dataset']
     dataset_file_path = get_dataset_path(output_dataset)
     write_csv_header(dataset_file_path, headers, overwrite=True)
+        
+
 
 if __name__ == '__main__':
     main()
