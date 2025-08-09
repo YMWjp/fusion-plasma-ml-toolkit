@@ -9,9 +9,31 @@ processing:
   temp_dir: "./temp/" # 一時ディレクトリ
   cleanup_files: true # 処理後クリーンアップ
   timeout_seconds: 300 # タイムアウト
+  sampling:
+    dt: 0.01 # s, サンプリング間隔（10ms）
+  constants:
+    ne_length: 1.86 # nel 規格化長
+  scaling:
+    fir_scale_window: [3.45, 3.75] # Thomson と FIR の係数合わせ時間窓 [s_start, s_end]
+  nbi:
+    perp_weight: 0.5 # Pnbi-perp の寄与係数
 
 # ログ設定
 logging:
   level: "INFO"
   format: "%(asctime)s - %(levelname)s - %(message)s"
   file: "processing.log"
+
+# ラベリング設定
+labeling:
+  derivative:
+    sigma: 2.0
+    threshold_percentile: 90
+  threshold:
+    threshold_percentile: 50
+  peak:
+    min_prominence: 0.1
+  window:
+    pre: 15
+    transition: 5
+    post: 15

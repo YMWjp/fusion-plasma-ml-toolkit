@@ -13,10 +13,11 @@ from src.infrastructure.parsers.egdb import Eg2D
 from src.infrastructure.repositories.rmp_repo import load_rmp_flag_from_csv
 from src.infrastructure.repositories.sdl_repo import load_sdl_file
 from src.utils.paths import DATASETS_DIR
-from src.utils.utils import write_csv_header
+from src.utils.utils import append_rows_to_csv, write_csv_header
 
-NE_LENGTH = 1.86  # 既存コードの規格化長
-DT = 0.01         # 10ms サンプリング
+cfg = load_config()
+NE_LENGTH = float(cfg['processing']['constants']['ne_length'])
+DT = float(cfg['processing']['sampling']['dt'])
 
 
 def _build_time_and_density(shot_no: int) -> tuple[np.ndarray, np.ndarray]:
@@ -31,7 +32,8 @@ def _build_time_and_density(shot_no: int) -> tuple[np.ndarray, np.ndarray]:
     th = np.array(eg.interpolate_series('nl_thomson_3669', time_raw))
     fir = np.array(eg.interpolate_series('nl_fir_3669', time_raw))
     # 係数スケーリング
-    in_window = np.logical_and(time_raw > 3.45, time_raw < 3.75)
+    win = cfg['processing']['scaling']['fir_scale_window']
+    in_window = np.logical_and(time_raw > float(win[0]), time_raw < float(win[1]))
     if np.any(in_window):
         factor = np.nanmean(fir[in_window]) / np.nanmean(th[in_window])
     elif time_raw.size > 3:
@@ -199,7 +201,7 @@ def build_one_shot_rows(shot_no: int, headers: list[str], *,
     nbi = _load_nbi(shot_no, time_list, nel_norm, geom['Bt_scalar'])
 
     # Pinput と比
-    pinput = heat['Pech'] + nbi['Pnbi-tan'] + 0.5 * nbi['Pnbi-perp']
+    pinput = heat['Pech'] + nbi['Pnbi-tan'] + float(cfg['processing']['nbi']['perp_weight']) * nbi['Pnbi-perp']
     prad = heat['Prad']
     prad_ratio = np.divide(prad, pinput, out=np.zeros_like(prad), where=pinput != 0)
 
@@ -256,16 +258,27 @@ def build_one_shot_rows(shot_no: int, headers: list[str], *,
     if detection_mode in (None, 'automatic'):
         if method == 'threshold':
             from src.domain.labeling.detachment import label_by_threshold as _lb
-            idx = _lb(isat7, threshold_percentile=50)
+            idx = _lb(isat7, threshold_percentile=float(cfg['labeling']['threshold']['threshold_percentile']))
         elif method == 'peak':
             from src.domain.labeling.detachment import label_by_peak as _lp
-            idx = _lp(isat7, min_prominence=0.1)
+            idx = _lp(isat7, min_prominence=float(cfg['labeling']['peak']['min_prominence']))
         else:
-            idx = label_by_derivative(isat7, sigma=2.0, threshold_percentile=90)
+            idx = label_by_derivative(
+                isat7,
+                sigma=float(cfg['labeling']['derivative']['sigma']),
+                threshold_percentile=float(cfg['labeling']['derivative']['threshold_percentile']),
+            )
     if idx is not None:
-        types = apply_window_labels(len(time_list), idx,
-                                    pre_range=15, transition_range=5, post_range=15,
-                                    pre_label=-1, transition_label=0, post_label=1)
+        types = apply_window_labels(
+            len(time_list),
+            idx,
+            pre_range=int(cfg['labeling']['window']['pre']),
+            transition_range=int(cfg['labeling']['window']['transition']),
+            post_range=int(cfg['labeling']['window']['post']),
+            pre_label=-1,
+            transition_label=0,
+            post_label=1,
+        )
     else:
         types = np.zeros_like(time_list, dtype=int)
 
@@ -317,22 +330,20 @@ def build_one_shot_rows(shot_no: int, headers: list[str], *,
 
 def run_native_pipeline(*, detection_mode: str | None = None, method: str | None = None) -> None:
     headers = get_basic_info_for_header() + get_parameters()
-    cfg = load_config()
     out_name = cfg['files']['output_dataset']
     out_path = DATASETS_DIR / out_name
     write_csv_header(out_path, headers, overwrite=True)
 
     shots = get_shot_numbers()
-    print(shots)
 
-    # for shot in shots:
-    #     # 必要ファイルが存在しない/失敗しても個別スキップ
-    #     try:
-    #         rows = build_one_shot_rows(int(shot), headers, detection_mode=detection_mode, method=method)
-    #         if rows is not None:
-    #             append_rows_to_csv(out_path, rows)
-    #     except Exception:
-    #         # 失敗ショットはログへ（既存の log_error_shot を使うほどではないため簡易無視）
-    #         continue
+    for shot in shots:
+        # 必要ファイルが存在しない/失敗しても個別スキップ
+        try:
+            rows = build_one_shot_rows(int(shot), headers, detection_mode=detection_mode, method=method)
+            if rows is not None:
+                append_rows_to_csv(out_path, rows)
+        except Exception:
+            # 失敗ショットはログへ（既存の log_error_shot を使うほどではないため簡易無視）
+            continue
 
 
