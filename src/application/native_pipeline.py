@@ -13,7 +13,7 @@ from src.infrastructure.parsers.eg3d import TsmapCalib
 from src.infrastructure.parsers.egdb import Eg2D
 from src.infrastructure.repositories.rmp_repo import load_rmp_flag_from_csv
 from src.infrastructure.repositories.sdl_repo import load_sdl_file
-from src.utils.paths import DATASETS_DIR
+from src.utils.paths import DATASETS_DIR, LOGS_DIR
 from src.utils.utils import append_rows_to_csv, write_csv_header
 
 cfg = load_config()
@@ -147,17 +147,11 @@ def _load_impurities_and_ha(shot_no: int, time_list: np.ndarray, nel: np.ndarray
         out['CIII'] = 2.655 * out['CIII']
         out['CIV'] = 2.896 * out['CIV']
 
-    # H-alpha 系
-    # D/(H+D)
-    try:
-        eg_ha3 = Eg2D(f"ha3@{shot_no}.dat")
-        dh = eg_ha3.interpolate_series('D/(H+D)', time_list)
-        dh[dh < 0.01] = 0.01
-    except Exception:
-        dh = np.zeros_like(time_list)
+    # H-alpha 系（ha3 は除外: D/(H+D) はゼロ埋め）
+    dh = np.zeros_like(time_list)
     out['D/(H+D)'] = dh
 
-    # HeI
+    # HeI（ha1 のみ維持）
     try:
         eg_ha1 = Eg2D(f"ha1@{shot_no}.dat")
         out['HeI'] = eg_ha1.interpolate_series('HeI(Impmon)', time_list)
@@ -181,7 +175,7 @@ def build_one_shot_rows(shot_no: int, headers: list[str], *,
                         method: str | None = None) -> np.ndarray | None:
     # 取得対象 EG の一括確保
     ensure_eg_files(shot_no, [
-        'tsmap_nel', 'wp', 'ip', 'echpw', 'bolo', 'imp02', 'ha1', 'ha2', 'ha3',
+        'tsmap_nel', 'wp', 'ip', 'echpw', 'bolo', 'imp02', 'ha1',
         'DivIis_tor_sum', 'nb1pwr_temporal', 'nb2pwr_temporal', 'nb3pwr_temporal',
         'nb4apwr_temporal', 'nb4bpwr_temporal', 'nb5apwr_temporal', 'nb5bpwr_temporal',
         'tsmap_calib'
@@ -329,6 +323,59 @@ def build_one_shot_rows(shot_no: int, headers: list[str], *,
     return arr
 
 
+def _quick_visualize(shot_no: int, headers: list[str], rows: np.ndarray, viz_cfg: dict) -> None:
+    from pathlib import Path
+
+    import matplotlib.pyplot as plt
+    import numpy as np
+
+    out_dir = Path(viz_cfg.get('out_dir', './outputs/process/native')).resolve()
+    out_dir.mkdir(parents=True, exist_ok=True)
+    dpi = int(viz_cfg.get('dpi', 120))
+
+    # rows: shape (N, M) for one shot; columns correspond to headers
+    data = {h: rows[:, i] for i, h in enumerate(headers)}
+    t = data['times']
+
+    fig, axes = plt.subplots(3, 2, figsize=(10, 8), sharex=True)
+    ax = axes.ravel()
+
+    ax[0].plot(t, data.get('nel', np.zeros_like(t)), label='nel')
+    ax[0].set_ylabel('nel')
+    ax[0].legend()
+
+    ax[1].plot(t, data.get('Prad', np.zeros_like(t)), label='Prad')
+    ax[1].plot(t, data.get('Pinput', np.zeros_like(t)), label='Pinput')
+    ax[1].set_ylabel('Power [MW]')
+    ax[1].legend()
+
+    ax[2].plot(t, data.get('Wp', np.zeros_like(t)), label='Wp (MJ)')
+    ax[2].set_ylabel('Wp')
+    ax[2].legend()
+
+    ax[3].plot(t, data.get('D/(H+D)', np.zeros_like(t)), label='D/(H+D)')
+    ax[3].set_ylabel('D/(H+D)')
+    ax[3].legend()
+
+    ax[4].plot(t, data.get('Isat@7L', np.zeros_like(t)), label='Isat@7L')
+    ax[4].set_ylabel('Isat@7L')
+    ax[4].legend()
+
+    ax[5].plot(t, data.get('Prad/Pinput', np.zeros_like(t)), label='Prad/Pinput')
+    ax[5].set_ylabel('Prad/Pinput')
+    ax[5].legend()
+
+    for a in ax:
+        a.grid(True, alpha=0.3)
+    axes[-1, 0].set_xlabel('time [s]')
+    axes[-1, 1].set_xlabel('time [s]')
+    fig.suptitle(f'Shot {shot_no} quick look')
+    fig.tight_layout(rect=[0, 0, 1, 0.96])
+
+    fig.savefig(out_dir / f'shot_{shot_no}_quicklook.png', dpi=dpi)
+    plt.close(fig)
+
+
 def run_native_pipeline(*, detection_mode: str | None = None, method: str | None = None) -> None:
     headers = get_basic_info_for_header() + get_parameters()
     out_name = cfg['files']['output_dataset']
@@ -337,15 +384,31 @@ def run_native_pipeline(*, detection_mode: str | None = None, method: str | None
 
     shots = get_shot_numbers()
     pbar = tqdm(shots, desc="Processing shots", unit="shot")
-    for shot in pbar:
+    # エラーログ出力先
+    error_log_path = LOGS_DIR / str(cfg['files'].get('error_log', 'errorshot.txt'))
+    error_log_path.parent.mkdir(parents=True, exist_ok=True)
+    for shot in pbar:        
         pbar.set_postfix_str(f"shot={int(shot)}")
         # 必要ファイルが存在しない/失敗しても個別スキップ
         try:
             rows = build_one_shot_rows(int(shot), headers, detection_mode=detection_mode, method=method)
             if rows is not None:
                 append_rows_to_csv(out_path, rows)
-        except Exception:
-            # 失敗ショットはログへ（既存の log_error_shot を使うほどではないため簡易無視）
+                # 可視化（設定が有効な場合）
+                viz_cfg = cfg['processing'].get('visualization', {})
+                if viz_cfg.get('enabled', False):
+                    try:
+                        _quick_visualize(int(shot), headers, rows, viz_cfg)
+                    except Exception as viz_e:
+                        tqdm.write(f"[WARN] visualization failed for shot {int(shot)}: {viz_e}")
+        except Exception as e:
+            # スキップ理由を表示・記録
+            tqdm.write(f"[WARN] shot {int(shot)} skipped: {e}")
+            try:
+                with error_log_path.open('a', encoding='utf-8') as f:
+                    f.write(f"shot {int(shot)}: {e}\n")
+            except Exception:
+                pass
             continue
 
 

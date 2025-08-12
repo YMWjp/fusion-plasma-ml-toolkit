@@ -5,12 +5,12 @@ from pathlib import Path
 import numpy as np
 from scipy import interpolate
 
-from src.utils.paths import EGDATA_DIR
+from src.utils.paths import EGDATA_DIR, resolve_egdata_file
 
 
 class Eg2D:
     def __init__(self, filename: str | Path):
-        self.path = (EGDATA_DIR / filename) if isinstance(filename, str) else Path(filename)
+        self.path = (resolve_egdata_file(filename) if isinstance(filename, str) else Path(filename))
         self.dimdata: list[float] = []
         self.data: list[list[float]] = []
         self.valnames: list[str] = []

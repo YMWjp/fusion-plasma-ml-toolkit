@@ -84,3 +84,9 @@ ENV/
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# raw_data
+*.dat
+
+# logs
+errorshot.txt

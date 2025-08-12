@@ -5,7 +5,7 @@ from pathlib import Path
 import numpy as np
 from scipy import interpolate
 
-from src.utils.paths import EGDATA_DIR
+from src.utils.paths import resolve_egdata_file
 
 
 class Eg3D:
@@ -15,7 +15,7 @@ class Eg3D:
     """
 
     def __init__(self, filename: str | Path):
-        self.path = (EGDATA_DIR / filename) if isinstance(filename, str) else Path(filename)
+        self.path = (resolve_egdata_file(filename) if isinstance(filename, str) else Path(filename))
         self.time: list[float] = []
         self.R: list[float] = []
         self.valnames: list[str] = []

@@ -1,29 +1,30 @@
+import argparse
 import datetime
 import json
-import argparse
-from scipy import signal
-from scipy.ndimage import gaussian_filter1d
 import tempfile
 
-# from getfile_dat import getfile_dat
-from getfile_http_2024 import getdata
-
-import numpy as np
-from get_params.get_Isat import get_Isat
-from get_params.get_nbi import get_nbi
-from classes.eg_read import eg_read
 import matplotlib.pyplot as plt
-from get_params.get_SDLloop import get_SDLloop
+import numpy as np
+from classes.CalcMPEXP import CalcMPEXP
+from classes.eg_read import eg_read
+
 # from get_params.get_beta_e import get_beta_e
 # from get_params.get_soxmos import get_soxmos
 # from get_params.get_beta0 import get_beta0
 # from get_params.get_fig import get_fig
 # from get_params.get_col import get_col
 # from get_params.get_rmp_lid import get_rmp_lid
-
 # _6 だらだら下がるやつ排除
 from egdb_class import egdb2d
-from classes.CalcMPEXP import CalcMPEXP
+from get_params.get_Isat import get_Isat
+from get_params.get_nbi import get_nbi
+from get_params.get_SDLloop import get_SDLloop
+
+# from getfile_dat import getfile_dat
+from getfile_http_2024 import getdata
+from scipy import signal
+from scipy.ndimage import gaussian_filter1d
+
 
 class DetachData(CalcMPEXP):
     """DetachData クラスの説明
@@ -130,7 +131,7 @@ class DetachData(CalcMPEXP):
         return 1
 
     def get_gdn_info(self, file_path):
-        with open(file_path, "r") as file:
+        with open(file_path) as file:
             lines = file.readlines()
             for line in lines:
                 if "gdn:" in line:
@@ -145,7 +146,7 @@ class DetachData(CalcMPEXP):
     def def_types(self, shotNO, config=None):
         """各時刻のラベルを self.type_list に格納する"""
         if config is None:
-            with open("config.json", "r") as config_file:
+            with open("config.json") as config_file:
                 config = json.load(config_file)
         
         detection_mode = config.get("detection_mode", "manual")
@@ -160,7 +161,7 @@ class DetachData(CalcMPEXP):
     def _get_egdata(self, shotNO, diagname, valname):
         """データ取得と整形"""
         getdata(shotNO, diagname, subshotNO=1)
-        filename = "{0}@{1:d}.dat".format(diagname, shotNO)
+        filename = f"{diagname}@{shotNO:d}.dat"
         egfile = egdb2d(filename)
         egfile.readFile()
         time = np.array(egfile.dimdata)
@@ -495,7 +496,7 @@ def main(savename="dataset_25_7.csv", labelname="labels.csv", ion=None,
         config_file: 設定ファイルのパス
     """
 
-    with open(config_file, "r") as f:
+    with open(config_file) as f:
         config = json.load(f)
     
     # コマンドライン引数で検出モードが指定された場合は上書き
@@ -584,7 +585,7 @@ if __name__ == "__main__":
     if args.method:
         
         # 一時的な設定ファイルを作成
-        with open(args.config, 'r') as f:
+        with open(args.config) as f:
             config = json.load(f)
         
         config['automatic_detection']['method'] = args.method

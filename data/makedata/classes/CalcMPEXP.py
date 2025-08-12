@@ -3,12 +3,13 @@ import pdb
 
 import matplotlib.pyplot as plt
 import numpy as np
-from .eg_read import eg_read
 from egdb_class import egdb2d
-from .GetFiles import GetFiles
-from .ISS04 import ISS04
 from read_tsmap_calib import EceSlow, TsmapCalib
 from scipy import interpolate, signal
+
+from .eg_read import eg_read
+from .GetFiles import GetFiles
+from .ISS04 import ISS04
 
 
 class CalcMPEXP(GetFiles):
@@ -1337,11 +1338,11 @@ class CalcMPEXP(GetFiles):
 
         axes[0].plot(self.time_list, self.wpdia)
         # axes[0].set_ylim(-0.1,5)
-        axes[0].set_ylabel('$W_{p}$[Mj]',fontsize=14)
+        axes[0].set_ylabel('$W_{p}$[Mj]',fontsize=9)
 
         axes[1].plot(self.time_list, self.nel/self.ne_length, '.-')
         axes[1].plot(self.time_list, self.nel_thomson/self.ne_length, 'x-')
-        axes[1].set_ylabel(r'$\bar{n}_e[10^{19} \mathrm{m}^{-3}]$',fontsize=12)
+        axes[1].set_ylabel(r'$\bar{n}_e[10^{19} \mathrm{m}^{-3}]$',fontsize=9)
 
         # HEATINGの行
         # self.get_ECH()
@@ -1353,8 +1354,8 @@ class CalcMPEXP(GetFiles):
         ax2_2.plot(self.time_list, self.wpdia, 'g.-', label='Wp_dia')
         ax2_2.plot(self.time_list, self.Wp_iss, 'k--', label='Wp_ISS')
         ax2_2.plot(self.time_list, self.Wp_iss/3, 'k:', label='30%')
-        axes[2].set_ylabel(r'$Power[\mathrm{MW}]$',fontsize=14)
-        ax2_2.set_ylabel(r'$W_p$[MJ]',fontsize=14)
+        axes[2].set_ylabel(r'$Power[\mathrm{MW}]$',fontsize=9)
+        ax2_2.set_ylabel(r'$W_p$[MJ]',fontsize=9)
         h1, l1 = axes[2].get_legend_handles_labels()
         h2, l2 = ax2_2.get_legend_handles_labels()
         axes[2].legend(h1+h2, l1+l2, loc='upper right')
@@ -1362,7 +1363,7 @@ class CalcMPEXP(GetFiles):
 
 
         axes[3].plot(self.time_list, self.prad, '.-')
-        axes[3].set_ylabel(r'$P_{rad}$',fontsize=14)
+        axes[3].set_ylabel(r'$P_{rad}$',fontsize=9)
         # axes[3].plot(self.time_list, self.prad/(self.nel/self.ne_length), '.-')
         # axes[3].set_ylabel(r'$P_{rad}/\bar{n}_e$',fontsize=14)
 
@@ -1373,11 +1374,11 @@ class CalcMPEXP(GetFiles):
         axes[4].plot(self.time_list, self.CIV/(self.nel/self.ne_length), '.-', label='CIV/nel')
         axes[4].legend(loc='upper right')
         axes[4].set_xlabel('time[s]',fontsize=14)
-        axes[4].set_ylabel(r'Imp/$\bar{n}_e$',fontsize=14)
+        axes[4].set_ylabel(r'Imp/$\bar{n}_e$',fontsize=9)
         axes[4].set_ylim(-0.1,2)
         ax4_2 = axes[4].twinx()
         ax4_2.plot(self.time_list, self.ha/(self.nel/self.ne_length), 'k.-', label='Ha/nel')
-        axes[4].set_ylabel(r'$H_\alpha/\bar{n}_e$',fontsize=14)
+        axes[4].set_ylabel(r'$H_\alpha/\bar{n}_e$',fontsize=9)
 
         '''
         axes[5].plot(self.time_list, self.FIG, '.-', label='FIG')
@@ -1433,17 +1434,17 @@ class CalcMPEXP(GetFiles):
         #     axes[i].legend(loc='upper right',fontsize=12)
 
         axes[6].plot(self.time_list, self.type_list)
-        axes[6].set_ylabel(r'type',fontsize=14)
+        axes[6].set_ylabel(r'type',fontsize=9)
 
         axes[7].plot(self.time_list, self.Te_edge)
-        axes[7].set_ylabel(r'$Te@edge$',fontsize=14)
+        axes[7].set_ylabel(r'$Te@edge$',fontsize=9)
 
         axes[8].plot(self.time_list, self.reff100eV, '.-', label='reff[m]@100eV')
         axes[8].plot(self.time_list, self.dV100eV/100, '.-', label=r'dVdreff[$\times 100 \mathrm{m}^2$]@100eV')
         ax6_2 = axes[8].twinx()
         ax6_2.plot(self.time_list, self.Te_center, 'g.-', label='Te[keV]@center')
-        axes[8].set_ylabel(r'reff & dVdreff',fontsize=14)
-        ax6_2.set_ylabel(r'$Te$[keV]',fontsize=14)
+        axes[8].set_ylabel(r'reff & dVdreff',fontsize=9)
+        ax6_2.set_ylabel(r'$Te$[keV]',fontsize=9)
         h1, l1 = axes[8].get_legend_handles_labels()
         h2, l2 = ax6_2.get_legend_handles_labels()
         axes[8].legend(h1+h2, l1+l2, loc='upper right')
@@ -1451,25 +1452,25 @@ class CalcMPEXP(GetFiles):
         axes[9].plot(self.time_list, self.ne100eV, '.-', label='ne@100eV')
         axes[9].plot(self.time_list, self.ne_center, '.-', label='ne@center')
         axes[9].plot(self.time_list, self.ne_edge, '.-', label='ne@edge')
-        axes[9].set_ylabel(r'$n_e[\times 10^{19} \mathrm{m}^{-3}]$',fontsize=12)
+        axes[9].set_ylabel(r'$n_e[\times 10^{19} \mathrm{m}^{-3}]$',fontsize=9)
         axes[9].legend(loc='upper right')
 
         axes[10].plot(self.time_list, self.CIII)
         axes[10].plot(self.time_list, self.CIII, label='CIII')
         axes[10].plot(self.time_list, self.OV, label='OV')
         axes[10].plot(self.time_list, self.OVI, label='OVI')
-        axes[10].set_ylabel(r'$\mathrm{CIII}$',fontsize=14)
-        axes[10].set_ylabel(r'$H_\alpha$',fontsize=14)
+        axes[10].set_ylabel(r'$\mathrm{CIII}$',fontsize=9)
+        axes[10].set_ylabel(r'$H_\alpha$',fontsize=9)
         axes[10].legend(loc='upper right')
 
         axes[10].plot(self.time_list, self.SDLloop_dphi, label='dphi')
-        axes[10].set_ylabel(r'$\Delta\Phi_{eff}$',fontsize=12)
+        axes[10].set_ylabel(r'$\Delta\Phi_{eff}$',fontsize=9)
         axes[11].plot(self.time_list, self.CIII, label='dtheta')
-        axes[11].set_ylabel(r'$\mathrm{CIII}$',fontsize=12)
+        axes[11].set_ylabel(r'$\mathrm{CIII}$',fontsize=9)
         # axes[12].plot(self.time_list, self.ne_soxmos, label='Ne')
         # axes[12].plot(self.time_list, self.ar_soxmos, label='Ar')
         axes[12].plot(self.time_list, self.SDLloop_dtheta, label='dtheta')
-        axes[12].set_ylabel(r'$\Delta\Theta_{eff}$',fontsize=12)
+        axes[12].set_ylabel(r'$\Delta\Theta_{eff}$',fontsize=9)
         axes[12].legend(loc='upper right')
 
         for i in range(len(axes)):

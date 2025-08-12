@@ -3,6 +3,12 @@ files:
   output_dataset: "dataset_25_7.csv"
   error_log: "errorshot.txt"
 
+# EG データ保存設定
+egdata:
+  layout: "by_shot" # flat | by_shot
+  by_shot_dirname_format: "{shot_no}" # 例: "{shot_no}" → src/data/egdata/163402/
+  subshots: [1, 2, 0] # 取得試行する subshot の優先順
+
 # 処理設定
 processing:
   parallel_workers: 4 # 並列処理数
@@ -17,6 +23,10 @@ processing:
     fir_scale_window: [3.45, 3.75] # Thomson と FIR の係数合わせ時間窓 [s_start, s_end]
   nbi:
     perp_weight: 0.5 # Pnbi-perp の寄与係数
+  visualization:
+    enabled: true
+    out_dir: "./outputs/process/native"
+    dpi: 120
 
 # ログ設定
 logging:
