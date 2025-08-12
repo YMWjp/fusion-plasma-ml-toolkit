@@ -12,6 +12,38 @@
       "console": "integratedTerminal",
       "justMyCode": false,
       "cwd": "${workspaceFolder}/makedata"
+    },
+    {
+      "name": "Run src.main (automatic)",
+      "type": "python",
+      "request": "launch",
+      "module": "src.main",
+      "args": ["--mode", "automatic"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": false,
+      "env": { "PYTHONPATH": "${workspaceFolder}" }
+    },
+    {
+      "name": "Run src.main (manual)",
+      "type": "python",
+      "request": "launch",
+      "module": "src.main",
+      "args": ["--mode", "manual"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": false,
+      "env": { "PYTHONPATH": "${workspaceFolder}" }
+    },
+    {
+      "name": "Python: Current File (repo root)",
+      "type": "python",
+      "request": "launch",
+      "program": "${file}",
+      "console": "integratedTerminal",
+      "justMyCode": false,
+      "cwd": "${workspaceFolder}",
+      "env": { "PYTHONPATH": "${workspaceFolder}" }
     }
   ]
 }
