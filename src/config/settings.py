@@ -15,13 +15,12 @@ def get_parameters():
     with open(path) as f:
         return yaml.safe_load(f)['parameters']
 
-def get_basic_info_for_header():
-    path = os.path.join(CONFIG_DIR, 'parameters.yaml')
-    with open(path) as f:
-        return yaml.safe_load(f)['basic_info_for_header']
-
 def load_config():
     path = os.path.join(CONFIG_DIR, 'config.yaml')
     with open(path) as f:
         return yaml.safe_load(f)
     
+def get_eg_data_sources():
+    path = os.path.join(CONFIG_DIR, 'parameters.yaml')
+    with open(path) as f:
+        return yaml.safe_load(f)['data_sources']

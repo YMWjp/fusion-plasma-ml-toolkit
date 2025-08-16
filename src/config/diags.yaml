@@ -1,0 +1,17 @@
+diags:
+  - tsmap_nel
+  - wp
+  - ip
+  - echpw
+  - bolo
+  - imp02
+  - ha1
+  - DivIis_tor_sum
+  - nb1pwr_temporal
+  - nb2pwr_temporal
+  - nb3pwr_temporal
+  - nb4apwr_temporal
+  - nb4bpwr_temporal
+  - nb5apwr_temporal
+  - nb5bpwr_temporal
+  - tsmap_calib
