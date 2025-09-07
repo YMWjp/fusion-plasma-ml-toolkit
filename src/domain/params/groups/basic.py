@@ -1,13 +1,11 @@
 from __future__ import annotations
 
 import numpy as np
-from scipy import interpolate
 
 from .. import param
 from ..context import Context
 
 
-# 完了
 @param("time", deps=[], needs=["tsmap_nel"], doc="Thomson時間軸[s]")
 def get_time(ctx: Context, deps):
     cfg = ctx.cfg
@@ -26,6 +24,30 @@ def get_B(ctx: Context, deps):
     # Bを時間軸の数分だけ複製
     B_list = np.full(len(deps["time"]), B)
     return B_list
+
+@param("Rax", deps=["time"], needs=["tsmap_nel"], doc="Rax")
+def get_Rax(ctx: Context, deps):
+    eg_tsmap_nel_comments = ctx.parse_tsmap_nel_comments("tsmap_nel")
+    Rax = eg_tsmap_nel_comments["Rax"]
+    # Raxを時間軸の数分だけ複製
+    Rax_list = np.full(len(deps["time"]), Rax)
+    return Rax_list
+
+@param("Bq", deps=["time"], needs=["tsmap_nel"], doc="Bq")
+def get_Bq(ctx: Context, deps):
+    eg_tsmap_nel_comments = ctx.parse_tsmap_nel_comments("tsmap_nel")
+    Bq = eg_tsmap_nel_comments["Bq"]
+    # Bqを時間軸の数分だけ複製
+    Bq_list = np.full(len(deps["time"]), Bq)
+    return Bq_list
+
+@param("Gamma", deps=["time"], needs=["tsmap_nel"], doc="Gamma")
+def get_Gamma(ctx: Context, deps):
+    eg_tsmap_nel_comments = ctx.parse_tsmap_nel_comments("tsmap_nel")
+    Gamma = eg_tsmap_nel_comments["Gamma"]
+    # Gammaを時間軸の数分だけ複製
+    Gamma_list = np.full(len(deps["time"]), Gamma)
+    return Gamma_list
 
 # 例：簡単な入力パワー（ダミー実装）
 # ここでは Pech, Pnbi-tan, Pnbi-perp を "nel のスカラー変換" として作るだけ
