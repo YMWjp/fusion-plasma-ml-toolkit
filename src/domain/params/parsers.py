@@ -49,7 +49,9 @@ class EGDBParser:
                     val_names = qre.findall(s)
             else:
                 if s and not s.startswith("#"):
-                    data_lines.append(line)
+                    # 行末のカンマとスペースを除去
+                    cleaned_line = line.rstrip(", \t")
+                    data_lines.append(cleaned_line)
 
         # 列名（Dim → Val）
         columns = dim_names + val_names

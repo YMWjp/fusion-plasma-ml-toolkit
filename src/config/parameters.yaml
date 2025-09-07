@@ -1,6 +1,8 @@
 data_sources:
   fircall: "{root}/fircall@{shotNO}.dat"
   tsmap_nel: "{root}/tsmap_nel@{shotNO}.dat"
+  imp01: "{root}/imp01@{shotNO}.dat"
+  imp02: "{root}/imp02@{shotNO}.dat"
 
 parameters:
   # 基本情報
@@ -24,18 +26,19 @@ parameters:
   # - beta # ベータ値
 
   # # 幾何パラメータ
-  # - Rax # 磁気軸位置
-  # - rax_vmec # VMEC磁気軸
-  # - a99 # 小半径
+  - Rax # 磁気軸位置
+  - rax_vmec # VMEC磁気軸
+  - a99 # 小半径
   # # - delta_sh # シフト？
 
-  # # 不純物
+  # 不純物
   # - D/(H+D) # 重水素比
-  # - CIII # 炭素3価
-  # - CIV # 炭素4価
-  # - OV # 酸素5価
-  # - OVI # 酸素6価
-  # - FeXVI # 鉄16価
+  - CIII # 炭素3価
+  - CIV # 炭素4価
+  - OV # 酸素5価
+  - OVI # 酸素6価
+  - FeXVI # 鉄16価
+
 
   # # その他
   # - Ip # プラズマ電流
