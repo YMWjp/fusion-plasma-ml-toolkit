@@ -93,9 +93,7 @@ class Context:
             return self._cache[cache_key]
         
         # ファイルパスを取得
-        file_path = f"{diag_name}@{self.shotNO}.dat"
-        p = Path(self.data_root) / file_path
-        
+        p = self.resolve_path(diag_name)
         if not p.exists():
             raise FileNotFoundError(f"File not found: {p}")
         
@@ -141,4 +139,73 @@ class Context:
         
         self._cache[cache_key] = comments
         return comments
+
+    def parse_norm_factors(self, key: str) -> dict[str, float]:
+        """
+        EGDBファイルのコメント欄から Norm.Factors を辞書型で抽出する
+        
+        Args:
+            key: キー（例: "imp02"）
+            
+        Returns:
+            パラメータ名をキー、正規化係数を値とする辞書
+        """
+        cache_key = f"norm_factors_{key}"
+        if cache_key in self._cache:
+            return self._cache[cache_key]
+        
+        # ファイルパスを取得
+        p = self.resolve_path(key)
+        
+        if not p.exists():
+            return {}
+        
+        # ファイルを読み込み
+        text = p.read_text(encoding="utf-8", errors="replace")
+        
+        # Norm.Factorsの抽出
+        norm_factors = {}
+        in_comments = False
+        
+        for line in text.splitlines():
+            line = line.strip()
+            
+            # [Comments]セクションの開始を検出
+            if "[Comments]" in line:
+                in_comments = True
+                continue
+            
+            # 次のセクション（[Data]など）が来たら終了
+            if in_comments and line.startswith("[") and line.endswith("]"):
+                break
+            
+            # コメント欄内で Norm.Factors を検索
+            if in_comments and line.startswith("#") and "Norm.Factors" in line:
+                # '#' を除去
+                content = line[1:].strip()
+                
+                # "Norm.Factors = " の部分を除去
+                if "Norm.Factors" in content:
+                    factors_str = content.split("Norm.Factors = ", 1)[1]
+                    
+                    # 各パラメータの係数を抽出
+                    # 例: "CIV:  1.000, OVI:  1.000, HI:  1.000"
+                    parts = factors_str.split(",")
+                    for part in parts:
+                        part = part.strip()
+                        if ":" in part:
+                            param_name, factor_str = part.split(":", 1)
+                            param_name = param_name.strip()
+                            factor_str = factor_str.strip()
+                            
+                            try:
+                                factor = float(factor_str)
+                                norm_factors[param_name] = factor
+                            except ValueError:
+                                # 数値変換に失敗した場合はスキップ
+                                continue
+                    break
+        
+        self._cache[cache_key] = norm_factors
+        return norm_factors
         

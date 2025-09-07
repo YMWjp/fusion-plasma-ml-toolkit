@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import numpy as np
+from scipy import interpolate
 
 from .. import param
 from ..context import Context
@@ -48,6 +49,38 @@ def get_Gamma(ctx: Context, deps):
     # Gammaを時間軸の数分だけ複製
     Gamma_list = np.full(len(deps["time"]), Gamma)
     return Gamma_list
+
+@param("rax_vmec", deps=["time"], needs=["tsmap_nel"], doc="rax_vmec")
+def get_rax_vmec(ctx: Context, deps):
+    eg_tsmap_nel = ctx.load_and_parse_raw_egdb("tsmap_nel")
+    time_list = np.array(eg_tsmap_nel["Time"][1:], dtype=float)
+    rax_vmec_list = np.array(eg_tsmap_nel["Rax_vmec"][1:], dtype=float)
+    f1_rax = interpolate.interp1d(time_list, rax_vmec_list, bounds_error=False, fill_value=0)
+    return f1_rax(deps["time"])
+
+@param("a99", deps=["time"], needs=["tsmap_nel"], doc="a99")
+def get_a99(ctx: Context, deps):
+    eg_tsmap_nel = ctx.load_and_parse_raw_egdb("tsmap_nel")
+    time_list = np.array(eg_tsmap_nel["Time"][1:], dtype=float)
+    a99_list = np.array(eg_tsmap_nel["a99"][1:], dtype=float)
+    f1_a99 = interpolate.interp1d(time_list, a99_list, bounds_error=False, fill_value=0)
+    return f1_a99(deps["time"])
+
+@param("R99", deps=["time"], needs=["tsmap_nel"], doc="R99")
+def get_R99(ctx: Context, deps):
+    eg_tsmap_nel = ctx.load_and_parse_raw_egdb("tsmap_nel")
+    time_list = np.array(eg_tsmap_nel["Time"][1:], dtype=float)
+    R99_list = np.array(eg_tsmap_nel["R99"][1:], dtype=float)
+    f1_R99 = interpolate.interp1d(time_list, R99_list, bounds_error=False, fill_value=0)
+    return f1_R99(deps["time"])
+
+@param("geom_center", deps=["time"], needs=["tsmap_nel"], doc="geom_center")
+def get_geom_center(ctx: Context, deps):
+    eg_tsmap_nel = ctx.load_and_parse_raw_egdb("tsmap_nel")
+    time_list = np.array(eg_tsmap_nel["Time"][1:], dtype=float)
+    geom_center_list = np.array(eg_tsmap_nel["geom_center"][1:], dtype=float)
+    f1_geom_center = interpolate.interp1d(time_list, geom_center_list, bounds_error=False, fill_value=0)
+    return f1_geom_center(deps["time"])
 
 # 例：簡単な入力パワー（ダミー実装）
 # ここでは Pech, Pnbi-tan, Pnbi-perp を "nel のスカラー変換" として作るだけ
