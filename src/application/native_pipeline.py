@@ -61,7 +61,6 @@ def run_native_pipeline(
         # just for a progress bar
         pbar.set_postfix_str(f"shot={int(shot)}")
         # 必要ファイルが存在しない/失敗しても個別スキップ
-        # try:
         if required_egs:
             ensure_eg_files(int(shot), required_egs)
 
@@ -71,9 +70,16 @@ def run_native_pipeline(
             data_sources=data_sources,
             cfg=cfg,
         )
+
+        # firを使用してプラズマの存在判定
+        # thomsonをベースとして各種パラメータを取得
+        # 
         # パラメータの計算
         results = compute(ctx, params, strict=True)
         time = np.asarray(results['time'])
+        if shot == 114282:
+            print("shot 114282")
+            print(time)
         n = len(time)
         if n == 0:
             tqdm.write(f"[INFO] shot {shot} skipped (no valid window)")
@@ -81,17 +87,14 @@ def run_native_pipeline(
 
         rowmap = {"shotNO": np.full(n, int(shot), dtype=int)}
         for p in params:
-            rowmap[p] = np.asarray(results[p])
+            # 浮動小数点の誤差を解決するため、適切な精度で丸める
+            raw_data = np.asarray(results[p])
+            if raw_data.dtype in [np.float64, np.float32]:
+                # 有効数字6桁で丸める
+                rounded_data = np.round(raw_data, decimals=6)
+                rowmap[p] = rounded_data
+            else:
+                rowmap[p] = raw_data
 
         df = pd.DataFrame(rowmap, columns=csv_headers)
         df.to_csv(out_path, mode='a', header=False, index=False)
-
-        # except Exception as e:
-        #     # スキップ理由を表示・記録
-        #     tqdm.write(f"[WARN] shot {int(shot)} skipped: {e}")
-        #     try:
-        #         with error_log_path.open('a', encoding='utf-8') as f:
-        #             f.write(f"shot {int(shot)}: {e}\n")
-        #     except Exception:
-        #         pass
-        #     continue

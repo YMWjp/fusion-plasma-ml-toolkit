@@ -1,5 +1,6 @@
 diags:
   - tsmap_nel
+  - tsmap
   - wp
   - ip
   - echpw

@@ -1,65 +1,39 @@
 from __future__ import annotations
 
 import numpy as np
+from scipy import interpolate
 
 from .. import param
 from ..context import Context
 
 
-# 有効窓（例：nL(3669)>0.5 を満たした最初～最後）を切り出す共通ヘルパ
-def _active_window(ctx: Context, *, thr=0.5, prefer_key="nL(3669)"):
-    df = ctx.load_fircall()
-
-    time = df.iloc[:, 0].to_numpy(dtype=float)
-    if prefer_key in df.columns:
-        nel = df[prefer_key].to_numpy(dtype=float)
-    else:
-        if df.shape[1] < 2:
-            # 2列目が無いケースは空返し
-            return time, np.array([], dtype=float), None, None
-        nel = df.iloc[:, 1].to_numpy(dtype=float)
-    mask = nel > thr
-    idx = np.where(mask)[0]
-    if idx.size < 3:
-        return time, nel, None, None
-    i0, i1 = int(np.nanmin(idx)), int(np.nanmax(idx))
-    return time, nel, i0, i1
-
-@param("time", deps=[], needs=["fircall"], doc="有効窓でトリムした時間[s]")
+# 完了
+@param("time", deps=[], needs=["tsmap_nel"], doc="Thomson時間軸[s]")
 def get_time(ctx: Context, deps):
-    t, _, i0, i1 = _active_window(ctx)
-    return np.array([]) if i0 is None else t[i0:i1+1]
+    cfg = ctx.cfg
+    eg = ctx.load_and_parse_raw_egdb("tsmap_nel")
+    dt = float(cfg['processing']['sampling']['dt'])
+    thomson_time_list = np.array(eg["Time"][1:], dtype=float)
+    time_list = np.arange(np.nanmin(thomson_time_list),
+                          np.nanmax(thomson_time_list),
+                          dt)
+    return time_list
 
-@param("type", deps=[], needs=["fircall"], doc="有効窓のタイプ")
-def get_type(ctx: Context, deps):
-    t, _, i0, i1 = _active_window(ctx)
-    return np.array([]) if i0 is None else t[i0:i1+1]
-
-@param("nel", deps=["time"], needs=["fircall"], doc="有効窓の nL(3669)")
-def get_nel(ctx: Context, deps):
-    _, nl, i0, i1 = _active_window(ctx)
-    return np.array([]) if i0 is None else nl[i0:i1+1]
-
-@param("B", deps=["time"], needs=["fircall"], doc="有効窓の B")
+@param("B", deps=["time"], needs=["tsmap_nel"], doc="磁場")
 def get_B(ctx: Context, deps):
-    t, _, i0, i1 = _active_window(ctx)
-    return np.array([]) if i0 is None else t[i0:i1+1]
-
-@param("nelgrad", deps=["time","nel"], needs=["fircall"], doc="dnL/dt")
-def get_nelgrad(ctx: Context, deps):
-    t = deps["time"]
-    nl = deps["nel"]
-    if t.size == 0 or nl.size == 0:
-        return np.array([])
-    return np.gradient(nl, t)
+    eg_tsmap_nel_comments = ctx.parse_tsmap_nel_comments("tsmap_nel")
+    B = eg_tsmap_nel_comments["Bt"]
+    # Bを時間軸の数分だけ複製
+    B_list = np.full(len(deps["time"]), B)
+    return B_list
 
 # 例：簡単な入力パワー（ダミー実装）
 # ここでは Pech, Pnbi-tan, Pnbi-perp を "nel のスカラー変換" として作るだけ
-# 実際のロジックに差し替える前提の“取っ掛かり”です。
+# 実際のロジックに差し替える前提の"取っ掛かり"です。
 @param("Pech", deps=["time"], needs=[], doc="ECH power (dummy)")
 def get_Pech(ctx: Context, deps):
     t = deps["time"]
-    return 0.8 * np.ones_like(t)  # 定数 [MW] のダミー
+    return 0.8 * np.ones_like(t)
 
 @param("Pnbi-tan", deps=["time"], needs=[], doc="NBI tangential (dummy)")
 def get_Pnbi_tan(ctx: Context, deps):
@@ -79,7 +53,7 @@ def get_Pinput(ctx: Context, deps):
 def get_Prad(ctx: Context, deps):
     # 単に nel に比例させたダミー
     nl = deps["nel"]
-    return 0.3 * (nl - nl.min()) / (np.ptp(nl) + 1e-9)  # 0～0.3 [MW] に正規化
+    return 0.3 * (nl - nl.min()) / (nl.ptp() + 1e-9)  # 0～0.3 [MW] に正規化
 
 @param("Prad_over_Pinput", deps=["Prad","Pinput"], needs=[], doc="Prad/Pinput (dummy)")
 def get_Prad_over_Pinput(ctx: Context, deps):
@@ -90,7 +64,7 @@ def get_Prad_over_Pinput(ctx: Context, deps):
     out[nz] = prad[nz] / p[nz]
     return out
 
-@param("beta", deps=["Pinput","B"], needs=[], doc="ダミーbeta")
+@param("beta", deps=["Pinput"], needs=[], doc="ダミーbeta")
 def get_beta(ctx, deps):
     # なんでもOK。まずはスカラー/配列を返せば動きます
     return np.zeros_like(deps["Pinput"])
@@ -109,4 +83,9 @@ def get_Ip(ctx: Context, deps):
 def get_Echpw(ctx: Context, deps):
     t = np.asarray(deps["time"])
     return np.zeros_like(t, dtype=float)
+
+@param("type", deps=["time"], needs=[], doc="type")
+def get_type(ctx: Context, deps):
+    t = np.asarray(deps["time"])
+    return np.zeros_like(t, dtype=int)
 

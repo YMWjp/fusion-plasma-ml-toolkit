@@ -1,5 +1,6 @@
 data_sources:
   fircall: "{root}/fircall@{shotNO}.dat"
+  tsmap_nel: "{root}/tsmap_nel@{shotNO}.dat"
 
 parameters:
   # 基本情報
