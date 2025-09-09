@@ -77,9 +77,6 @@ def run_native_pipeline(
         # パラメータの計算
         results = compute(ctx, params, strict=True)
         time = np.asarray(results['time'])
-        if shot == 114282:
-            print("shot 114282")
-            print(time)
         n = len(time)
         if n == 0:
             tqdm.write(f"[INFO] shot {shot} skipped (no valid window)")

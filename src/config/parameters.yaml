@@ -3,6 +3,9 @@ data_sources:
   tsmap_nel: "{root}/tsmap_nel@{shotNO}.dat"
   imp01: "{root}/imp01@{shotNO}.dat"
   imp02: "{root}/imp02@{shotNO}.dat"
+  wp: "{root}/wp@{shotNO}.dat"
+  ip: "{root}/ip@{shotNO}.dat"
+  echpw: "{root}/echpw@{shotNO}.dat"
 
 parameters:
   # 基本情報
@@ -15,15 +18,15 @@ parameters:
 
   # 加熱パワー
   - Pech # ECH加熱
-  - Pnbi-tan # NBI tangential
-  - Pnbi-perp # NBI perpendicular
+  # - Pnbi-tan # NBI tangential
+  # - Pnbi-perp # NBI perpendicular
   # - Pinput # 総入力パワー
 
   # # 放射・エネルギー
   # - Prad # 放射パワー
   # - Prad_over_Pinput # 放射パワー比
-  # - Wp # 蓄積エネルギー
-  # - beta # ベータ値
+  - Wp # 蓄積エネルギー
+  - beta # ベータ値
 
   # # 幾何パラメータ
   - Rax # 磁気軸位置
@@ -39,9 +42,8 @@ parameters:
   - OVI # 酸素6価
   - FeXVI # 鉄16価
 
-
   # # その他
-  # - Ip # プラズマ電流
+  - Ip # プラズマ電流
   # # - FIG # 不明な指標
   # # - Pcc # 不明な指標
   # - Isat@4R # 飽和電流4R
@@ -54,7 +56,7 @@ parameters:
   # - Te@edge # 周辺電子温度
   # - ne@center # 中心電子密度
   # # - ne_peak # ピーク密度？
-  # - RMP_LID # RMP制御
+  # # - RMP_LID # RMP制御
   # - SDLloop_dPhi # SDLループ磁束
   # - SDLloop_dPhi_ext # SDLループ磁束(外部)
   # - SDLloop_dTheta # SDLループ角度

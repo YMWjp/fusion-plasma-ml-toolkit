@@ -82,13 +82,43 @@ def get_geom_center(ctx: Context, deps):
     f1_geom_center = interpolate.interp1d(time_list, geom_center_list, bounds_error=False, fill_value=0)
     return f1_geom_center(deps["time"])
 
+@param("Wp", deps=["time"], needs=["wp"], doc="Wp")
+def get_Wp(ctx: Context, deps):
+    eg_wp = ctx.load_and_parse_raw_egdb("wp")
+    time_list = np.array(eg_wp["Time"], dtype=float)
+    # Wpを[kJ]から[MJ]に変換
+    Wp_list = np.array(eg_wp["Wp"]/1000, dtype=float)
+    f1_Wp = interpolate.interp1d(time_list, Wp_list, bounds_error=False, fill_value=0)
+    return f1_Wp(deps["time"])
+
+@param("beta", deps=["time"], needs=["wp"], doc="beta")
+def get_beta(ctx: Context, deps):
+    eg_wp = ctx.load_and_parse_raw_egdb("wp")
+    time_list = np.array(eg_wp["Time"], dtype=float)
+    beta_list = np.array(eg_wp["<beta-dia>"], dtype=float)
+    f1_beta = interpolate.interp1d(time_list, beta_list, bounds_error=False, fill_value=0)
+    return f1_beta(deps["time"])
+
+@param("Ip", deps=["time"], needs=["ip"], doc="Ip")
+def get_Ip(ctx: Context, deps):
+    eg_ip = ctx.load_and_parse_raw_egdb("ip")
+    time_list = np.array(eg_ip["Time"], dtype=float)
+    Ip_list = np.array(eg_ip["Ip"], dtype=float)
+    f1_Ip = interpolate.interp1d(time_list, Ip_list, bounds_error=False, fill_value=0)
+    return f1_Ip(deps["time"])
+
+
+@param("Pech", deps=["time"], needs=["echpw"], doc="ECH power")
+def get_Pech(ctx: Context, deps):
+    eg_echpw = ctx.load_and_parse_raw_egdb("echpw")
+    time_list = np.array(eg_echpw["Time"], dtype=float)
+    Pech_list = np.array(eg_echpw["Total ECH"], dtype=float)
+    f1_Pech = interpolate.interp1d(time_list, Pech_list, bounds_error=False, fill_value=0)
+    return f1_Pech(deps["time"])
+
 # 例：簡単な入力パワー（ダミー実装）
 # ここでは Pech, Pnbi-tan, Pnbi-perp を "nel のスカラー変換" として作るだけ
 # 実際のロジックに差し替える前提の"取っ掛かり"です。
-@param("Pech", deps=["time"], needs=[], doc="ECH power (dummy)")
-def get_Pech(ctx: Context, deps):
-    t = deps["time"]
-    return 0.8 * np.ones_like(t)
 
 @param("Pnbi-tan", deps=["time"], needs=[], doc="NBI tangential (dummy)")
 def get_Pnbi_tan(ctx: Context, deps):
@@ -119,20 +149,6 @@ def get_Prad_over_Pinput(ctx: Context, deps):
     out[nz] = prad[nz] / p[nz]
     return out
 
-@param("beta", deps=["Pinput"], needs=[], doc="ダミーbeta")
-def get_beta(ctx, deps):
-    # なんでもOK。まずはスカラー/配列を返せば動きます
-    return np.zeros_like(deps["Pinput"])
-
-@param("Wp", deps=["time"], needs=["wp"], doc="Wp (dummy)")
-def get_Wp(ctx: Context, deps):
-    t = np.asarray(deps["time"])
-    return np.zeros_like(t, dtype=float)
-
-@param("Ip", deps=["time"], needs=["ip"], doc="Ip (dummy)")
-def get_Ip(ctx: Context, deps):
-    t = np.asarray(deps["time"])
-    return np.zeros_like(t, dtype=float)
 
 @param("Echpw", deps=["time"], needs=["echpw"], doc="Echpw (dummy)")
 def get_Echpw(ctx: Context, deps):

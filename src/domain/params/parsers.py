@@ -55,19 +55,31 @@ class EGDBParser:
 
         # 列名（Dim → Val）
         columns = dim_names + val_names
+        
+        # 重複する列名を修正
+        unique_columns = []
+        name_counts = {}
+        for col in columns:
+            if col in name_counts:
+                name_counts[col] += 1
+                unique_columns.append(f"{col}_{name_counts[col]}")
+            else:
+                name_counts[col] = 0
+                unique_columns.append(col)
+        
         # 数値部をCSVとして読込（カンマ区切り・空白混在・指数表記OK）
         df = pd.read_csv(
             io.StringIO("\n".join(data_lines)),
             header=None,
-            names=columns if columns else None,
+            names=unique_columns if unique_columns else None,
             comment="#",
             skip_blank_lines=True,
             engine="python",
         )
         # 列過剰なら切り詰め（最小限の護身）
-        if columns and df.shape[1] > len(columns):
-            df = df.iloc[:, :len(columns)]
-            df.columns = columns
+        if unique_columns and df.shape[1] > len(unique_columns):
+            df = df.iloc[:, :len(unique_columns)]
+            df.columns = unique_columns
 
         return df
     
