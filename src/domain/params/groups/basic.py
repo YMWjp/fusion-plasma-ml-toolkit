@@ -118,43 +118,6 @@ def get_Pech(ctx: Context, deps):
 
 # 例：簡単な入力パワー（ダミー実装）
 # ここでは Pech, Pnbi-tan, Pnbi-perp を "nel のスカラー変換" として作るだけ
-# 実際のロジックに差し替える前提の"取っ掛かり"です。
-
-@param("Pnbi-tan", deps=["time"], needs=[], doc="NBI tangential (dummy)")
-def get_Pnbi_tan(ctx: Context, deps):
-    t = deps["time"]
-    return 1.2 * np.ones_like(t)
-
-@param("Pnbi-perp", deps=["time"], needs=[], doc="NBI perpendicular (dummy)")
-def get_Pnbi_perp(ctx: Context, deps):
-    t = deps["time"]
-    return 0.5 * np.ones_like(t)
-
-@param("Pinput", deps=["Pech","Pnbi-tan","Pnbi-perp"], needs=[], doc="総入力パワー (dummy)")
-def get_Pinput(ctx: Context, deps):
-    return deps["Pech"] + deps["Pnbi-tan"] + deps["Pnbi-perp"]
-
-@param("Prad", deps=["time","nel"], needs=[], doc="放射パワー (dummy)")
-def get_Prad(ctx: Context, deps):
-    # 単に nel に比例させたダミー
-    nl = deps["nel"]
-    return 0.3 * (nl - nl.min()) / (nl.ptp() + 1e-9)  # 0～0.3 [MW] に正規化
-
-@param("Prad_over_Pinput", deps=["Prad","Pinput"], needs=[], doc="Prad/Pinput (dummy)")
-def get_Prad_over_Pinput(ctx: Context, deps):
-    prad = deps["Prad"]
-    p = deps["Pinput"]
-    out = np.zeros_like(prad)
-    nz = p != 0
-    out[nz] = prad[nz] / p[nz]
-    return out
-
-
-@param("Echpw", deps=["time"], needs=["echpw"], doc="Echpw (dummy)")
-def get_Echpw(ctx: Context, deps):
-    t = np.asarray(deps["time"])
-    return np.zeros_like(t, dtype=float)
-
 @param("type", deps=["time"], needs=[], doc="type")
 def get_type(ctx: Context, deps):
     t = np.asarray(deps["time"])

@@ -13,7 +13,7 @@ from src.config.settings import (
 from src.domain.params.autodiscover import autodiscover
 from src.domain.params.context import Context
 from src.domain.params.executor import compute, list_required_egs
-from src.infrastructure.clients.lhd_api import ensure_eg_files
+from src.infrastructure.clients.lhd_api import ensure_eg_files_safe
 
 # moved detailed parsers usage into domain/params modules
 from src.utils.paths import DATASETS_DIR, EGDATA_DIR, LOGS_DIR
@@ -62,7 +62,7 @@ def run_native_pipeline(
         pbar.set_postfix_str(f"shot={int(shot)}")
         # 必要ファイルが存在しない/失敗しても個別スキップ
         if required_egs:
-            ensure_eg_files(int(shot), required_egs)
+            ensure_eg_files_safe(int(shot), required_egs)
 
         ctx = Context(
             shotNO=int(shot),

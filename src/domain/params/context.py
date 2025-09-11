@@ -34,6 +34,9 @@ class Context:
             return self._cache[cache_key]
 
         p = self.resolve_path(key)
+        if not p.exists():
+            return None
+        
         text = p.read_text(encoding="utf-8", errors="replace")
 
         # パーサーモジュールを使用

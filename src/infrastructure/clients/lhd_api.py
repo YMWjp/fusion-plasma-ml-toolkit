@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from collections.abc import Iterable
 from pathlib import Path
 
@@ -50,12 +51,23 @@ def fetch_eg_file(diagname: str, shot_no: int, *, subshot_no: int | None = None,
     raise RuntimeError(f"Failed to fetch EG file: diag={diagname}, shot={shot_no}, subshots={subshot_list}")
 
 
-def ensure_eg_files(shot_no: int, diagnames: Iterable[str], *, subshot_no: int | None = None,
-                    save_dir: Path | None = None) -> list[Path]:
+def ensure_eg_files_safe(shot_no: int, diagnames: Iterable[str], *, subshot_no: int | None = None,
+                        save_dir: Path | None = None) -> list[Path]:
     """
-    必要なすべての EG ファイルを取得。既存ファイルがあればスキップ。
-    """
-    return [fetch_eg_file(diag, shot_no, subshot_no=subshot_no, save_dir=save_dir)
-            for diag in diagnames]
+    必要なすべての EG ファイルを取得。失敗した場合は警告を出してスキップ。
+    既存ファイルがあればスキップ。
+    """    
+    logger = logging.getLogger(__name__)
+    
+    successful_files = []
+    for diag in diagnames:
+        try:
+            file_path = fetch_eg_file(diag, shot_no, subshot_no=subshot_no, save_dir=save_dir)
+            successful_files.append(file_path)
+        except RuntimeError as e:
+            logger.warning(f"Skipping {diag} for shot {shot_no}: {e}")
+            continue
+    
+    return successful_files
 
 

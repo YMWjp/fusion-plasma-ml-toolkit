@@ -6,6 +6,15 @@ data_sources:
   wp: "{root}/wp@{shotNO}.dat"
   ip: "{root}/ip@{shotNO}.dat"
   echpw: "{root}/echpw@{shotNO}.dat"
+  ha3: "{root}/ha3@{shotNO}.dat"
+  bolo: "{root}/bolo@{shotNO}.dat"
+  nb1pwr_temporal: "{root}/nb1pwr_temporal@{shotNO}.dat"
+  nb2pwr_temporal: "{root}/nb2pwr_temporal@{shotNO}.dat"
+  nb3pwr_temporal: "{root}/nb3pwr_temporal@{shotNO}.dat"
+  nb4apwr_temporal: "{root}/nb4apwr_temporal@{shotNO}.dat"
+  nb4bpwr_temporal: "{root}/nb4bpwr_temporal@{shotNO}.dat"
+  nb5apwr_temporal: "{root}/nb5apwr_temporal@{shotNO}.dat"
+  nb5bpwr_temporal: "{root}/nb5bpwr_temporal@{shotNO}.dat"
 
 parameters:
   # 基本情報
@@ -18,13 +27,13 @@ parameters:
 
   # 加熱パワー
   - Pech # ECH加熱
-  # - Pnbi-tan # NBI tangential
-  # - Pnbi-perp # NBI perpendicular
-  # - Pinput # 総入力パワー
+  - Pnbi-tan # NBI tangential
+  - Pnbi-perp # NBI perpendicular
+  - Pinput # 総入力パワー
 
-  # # 放射・エネルギー
-  # - Prad # 放射パワー
-  # - Prad_over_Pinput # 放射パワー比
+  # 放射・エネルギー
+  - Prad # 放射パワー
+  - Prad_over_Pinput # 放射パワー比
   - Wp # 蓄積エネルギー
   - beta # ベータ値
 
@@ -32,17 +41,17 @@ parameters:
   - Rax # 磁気軸位置
   - rax_vmec # VMEC磁気軸
   - a99 # 小半径
-  # # - delta_sh # シフト？
+  # - delta_sh # シフト？
 
   # 不純物
-  # - D/(H+D) # 重水素比
+  - D/(H+D) # 重水素比
   - CIII # 炭素3価
   - CIV # 炭素4価
   - OV # 酸素5価
   - OVI # 酸素6価
   - FeXVI # 鉄16価
 
-  # # その他
+  # その他
   - Ip # プラズマ電流
   # # - FIG # 不明な指標
   # # - Pcc # 不明な指標
