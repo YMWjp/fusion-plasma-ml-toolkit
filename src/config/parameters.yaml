@@ -67,9 +67,10 @@ parameters:
   # - ne@center # 中心電子密度
   # # - ne_peak # ピーク密度？
   # # - RMP_LID # RMP制御
-  # - SDLloop_dPhi # SDLループ磁束
-  # - SDLloop_dPhi_ext # SDLループ磁束(外部)
-  # - SDLloop_dTheta # SDLループ角度
+  - SDLloop_dPhi # SDLループ磁束
+  - SDLloop_dPhi_ext # SDLループ磁束(外部)
+  - SDLloop_dTheta # SDLループ角度
+
 
   # コメントアウトされていたその他のパラメータ
   # - beta_e # 電子ベータ？
