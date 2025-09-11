@@ -27,6 +27,8 @@ processing:
     enabled: true
     out_dir: "./outputs/process/native"
     dpi: 120
+  isat_smoothing:
+    window: 21
 
 # ログ設定
 logging:

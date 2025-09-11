@@ -15,6 +15,7 @@ data_sources:
   nb4bpwr_temporal: "{root}/nb4bpwr_temporal@{shotNO}.dat"
   nb5apwr_temporal: "{root}/nb5apwr_temporal@{shotNO}.dat"
   nb5bpwr_temporal: "{root}/nb5bpwr_temporal@{shotNO}.dat"
+  DivIis_tor_sum: "{root}/DivIis_tor_sum@{shotNO}.dat"
 
 parameters:
   # 基本情報
@@ -57,7 +58,7 @@ parameters:
   # # - Pcc # 不明な指標
   # - Isat@4R # 飽和電流4R
   # - Isat@6L # 飽和電流6L
-  # - Isat@7L # 飽和電流7L
+  - Isat@7L # 飽和電流7L
   # - reff@100eV # 100eV位置
   # - ne@100eV # 100eV電子密度
   # - dVdreff@100eV # 体積微分
