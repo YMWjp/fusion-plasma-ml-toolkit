@@ -13,7 +13,7 @@ from .parsers import EGDBParser
 class Context:
     shotNO: int
     data_root: str
-    data_sources: dict         # config.yml の data_sources セクション
+    data_sources: dict
     cfg: dict          
     _cache: dict[str, Any] = field(default_factory=dict, init=False, repr=False)
         # 必要なら使う。不要なら削ってもOK
@@ -43,6 +43,28 @@ class Context:
         df = EGDBParser.parse_raw_egdb(text)
         self._cache[cache_key] = df
         return df
+
+    def load_and_parse_raw_egdb_2D(self, key: str, dim_name: str, dim_value: str) -> pd.DataFrame:
+        """
+        EGDBテキスト（#ヘッダ + [data] 数値行）を読み込み、DimName→ValNameの順で
+        ヘッダを付けたDataFrameを返す。単位は無視。存在チェックは最小限。
+        """
+        # 簡易キャッシュ
+        cache_key = f"egdb:{key}"
+        if cache_key in self._cache:
+            return self._cache[cache_key]
+
+        p = self.resolve_path(key)
+        if not p.exists():
+            return None
+        
+        text = p.read_text(encoding="utf-8", errors="replace")
+
+        # パーサーモジュールを使用
+        df = EGDBParser.parse_raw_egdb_2D(text, dim_name, dim_value)
+        self._cache[cache_key] = df
+        return df
+
 
     def parse_tsmap_nel_comments(self, diag_name: str = "tsmap_nel") -> dict[str, float]:
         """

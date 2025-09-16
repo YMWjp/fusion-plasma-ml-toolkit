@@ -15,14 +15,14 @@ def get_Prad(ctx: Context, deps):
     Rad_PW = np.array(bolo_data["Rad_PW"][1:], dtype=float)
     Rad_PW_smooth = signal.savgol_filter(Rad_PW, 101, 4)
 
-    # get_Prad_comparison(bolo_data)
+    # get_Prad_comparison(bolo_data, ctx)
     
     f1_Rad_PW = interpolate.interp1d(bolo_time, Rad_PW_smooth, bounds_error=False, fill_value=0)
     time_values = deps["time"]
     return f1_Rad_PW(time_values)
 
 
-def get_Prad_comparison(bolo_data):
+def get_Prad_comparison(bolo_data, ctx: Context):
     """複数の放射パワーデータを比較表示する関数"""
     bolo_time = np.array(bolo_data["Time"][1:], dtype=float)
     Rad_PW = np.array(bolo_data["Rad_PW"][1:], dtype=float)
@@ -33,16 +33,18 @@ def get_Prad_comparison(bolo_data):
     
     # 同じグラフに複数のデータを表示
     plt.figure(figsize=(12, 8))
-    
-    # サブプロット1: 時間系列比較
+
+    # 2~9秒の間を表示
+    plt.xlim(2, 9)
     plt.plot(bolo_time, Rad_PW, label='Raw Rad_PW', alpha=0.6, linewidth=1)
     plt.plot(bolo_time, Rad_PW_smooth_2, label='Smooth (51)', linewidth=2)
     plt.plot(bolo_time, Rad_PW_smooth, label='Smooth (101)', linewidth=2)
     plt.plot(bolo_time, Rad_PW_smooth_3, label='Smooth (201)', linewidth=2)
     plt.xlabel('Time (s)')
     plt.ylabel('Radiated Power (kW)')
-    plt.title('Radiated Power: Different Smoothing Parameters')
+    plt.title('Radiated Power: Different Smoothing Parameters ' + f'Shot {ctx.shotNO}')
     plt.legend()
     plt.grid(True, alpha=0.3)
-    plt.show()
+    plt.show
+    # plt.savefig(SAV_GOL_COMPARISON_DIR / f"Prad_comparison_{ctx.shotNO}.png")
     return

@@ -5,7 +5,6 @@ import pandas as pd
 from tqdm import tqdm
 
 from src.config.settings import (
-    get_eg_data_sources,
     get_parameters,
     get_shot_numbers,
     load_config,
@@ -44,12 +43,10 @@ def run_native_pipeline(
     # 使用するショット番号一覧
     shots = get_shot_numbers()
 
-    # 使用するデータソース
-    data_sources = get_eg_data_sources()
-
     autodiscover()
 
-    required_egs = list_required_egs(params)
+    # 使用するデータソース
+    required_egs, data_sources = list_required_egs(params)
 
     pbar = tqdm(shots, desc="Processing shots", unit="shot")
     # エラーログ出力先

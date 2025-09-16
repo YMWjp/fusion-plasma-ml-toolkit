@@ -82,6 +82,103 @@ class EGDBParser:
             df.columns = unique_columns
 
         return df
+
+    @staticmethod
+    def parse_raw_egdb_2D(content: str, dim_name: str, dim_value: str) -> pd.DataFrame:
+        """
+        EGDBテキスト（#ヘッダ + [data] 数値行）を読み込み、DimName→ValNameの順で
+        ヘッダを付けたDataFrameを返す。単位は無視。存在チェックは最小限。
+        
+        Args:
+            content: EGDBファイルの内容（文字列）
+            dim_name: 次元名
+            dim_value: 次元値（"max"の場合は最大値を使用）
+        Returns:
+            パースされたDataFrame
+        """
+        qre = re.compile(r"'([^']*)'")
+
+        dim_names, val_names = [], []
+        data_lines = []
+        in_data = False
+
+        for raw in content.splitlines():
+            line = raw.rstrip("\n")
+            s = line.strip()
+
+            if not in_data:
+                if "[data]" in s.lower():
+                    in_data = True
+                    continue
+                if not s.startswith("#"):
+                    continue
+                if dim_name in s:
+                    dim_names = qre.findall(s)  # 例: ["Time","R"]
+                elif "ValName" in s:
+                    val_names = qre.findall(s)
+            else:
+                if s and not s.startswith("#"):
+                    # 行末のカンマとスペースを除去
+                    cleaned_line = line.rstrip(", \t")
+                    data_lines.append(cleaned_line)
+
+        # 列名（Dim → Val）
+        columns = dim_names + val_names
+        
+        # 重複する列名を修正
+        unique_columns = []
+        name_counts = {}
+        for col in columns:
+            if col in name_counts:
+                name_counts[col] += 1
+                unique_columns.append(f"{col}_{name_counts[col]}")
+            else:
+                name_counts[col] = 0
+                unique_columns.append(col)
+        
+        # 数値部をCSVとして読込（カンマ区切り・空白混在・指数表記OK）
+        df = pd.read_csv(
+            io.StringIO("\n".join(data_lines)),
+            header=None,
+            names=unique_columns if unique_columns else None,
+            comment="#",
+            skip_blank_lines=True,
+            engine="python",
+        )
+        # 列過剰なら切り詰め（最小限の護身）
+        if unique_columns and df.shape[1] > len(unique_columns):
+            df = df.iloc[:, :len(unique_columns)]
+            df.columns = unique_columns
+
+        # dim_valueが"max"の場合は最大値を使用
+        if dim_value.lower() == "max" and dim_name in df.columns:
+            # dim_name列のユニークな値を取得
+            unique_values = df[dim_name].unique()
+            # 数値として比較可能な値のみを抽出
+            numeric_values = []
+            for val in unique_values:
+                try:
+                    numeric_values.append(float(val))
+                except (ValueError, TypeError):
+                    continue
+            
+            if numeric_values:
+                # 最大値を見つける
+                max_value = max(numeric_values)
+                # 最大値に一致する行のみを抽出（数値として比較）
+                df = df[df[dim_name].astype(float) == max_value]
+        else:
+            # 指定されたdim_valueの行のみを抽出
+            if dim_name in df.columns:
+                # 数値として比較可能かチェック
+                try:
+                    target_value = float(dim_value)
+                    df = df[df[dim_name].astype(float) == target_value]
+                except (ValueError, TypeError):
+                    # 数値でない場合は文字列として比較（前後の空白を除去）
+                    df = df[df[dim_name].astype(str).str.strip() == str(dim_value).strip()]
+
+        return df
     
     @staticmethod
     def parse_comments(content: str) -> dict[str, float]:

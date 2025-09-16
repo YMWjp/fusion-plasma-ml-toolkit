@@ -47,9 +47,14 @@ def compute(ctx: Context, requested: list[str], *, strict: bool=True) -> dict[st
             results[name] = None
     return {k: results.get(k) for k in requested}
 
-def list_required_egs(requested: list[str]) -> list[str]:
+def list_required_egs(requested: list[str]) -> tuple[list[str], dict[str, str]]:
     order = _expand(requested)
     need_keys: set[str] = set()
     for p in order:
         need_keys.update(REG.meta.get(p, {}).get("needs", []))
-    return sorted(need_keys)
+
+    required_egs = sorted(need_keys)
+    data_sources = {}
+    for eg in required_egs:
+        data_sources[eg] = f"{{root}}/{eg}@{{shotNO}}.dat"
+    return required_egs, data_sources

@@ -9,7 +9,7 @@ from ..context import Context
 
 def _get_nbi_power_for_units(ctx: Context, time_values: np.ndarray, 
                            diagnames: list[str]) -> np.ndarray:
-    """Get NBI power for multiple units with unit conversion."""
+    """G et NBI power for multiple units with unit conversion."""
     nbi_power_list = []
     
     for diag in diagnames:
@@ -45,7 +45,7 @@ def _get_nbi_power_for_units(ctx: Context, time_values: np.ndarray,
     return np.vstack(nbi_power_list)
 
 
-@param("Pnbi-tan", deps=["time"], needs=["nb1pwr_temporal", "nb2pwr_temporal", "nb3pwr_temporal"], 
+@param("Pnbi-tan-temporal", deps=["time"], needs=["nb1pwr_temporal", "nb2pwr_temporal", "nb3pwr_temporal"], 
        doc="NBI tangential power")
 def get_Pnbi_tan(ctx: Context, deps):
     """Calculate tangential NBI power from nb1, nb2, nb3 data."""
@@ -62,7 +62,7 @@ def get_Pnbi_tan(ctx: Context, deps):
     return nbi_tan_total
 
 
-@param("Pnbi-perp", deps=["time"], 
+@param("Pnbi-perp-temporal", deps=["time"], 
        needs=["nb4apwr_temporal", "nb4bpwr_temporal", "nb5apwr_temporal", "nb5bpwr_temporal"], 
        doc="NBI perpendicular power")
 def get_Pnbi_perp(ctx: Context, deps):
@@ -79,21 +79,6 @@ def get_Pnbi_perp(ctx: Context, deps):
     
     return nbi_perp_total
 
-@param("Pinput", deps=["Pech","Pnbi-tan","Pnbi-perp"], needs=[], doc="総入力パワー")
+@param("Pinput-temporal", deps=["Pech","Pnbi-tan-temporal","Pnbi-perp-temporal"], needs=[], doc="総入力パワー")
 def get_Pinput(ctx: Context, deps):
-    return deps["Pech"] + deps["Pnbi-tan"] + deps["Pnbi-perp"]*0.36
-
-@param("Prad_over_Pinput", deps=["Prad","Pinput"], needs=[], doc="Prad/Pinput ratio")
-def get_Prad_over_Pinput(ctx: Context, deps):
-    """Calculate Prad/Pinput ratio with proper handling of zero input power."""
-    prad = np.asarray(deps["Prad"], dtype=float)
-    pinput = np.asarray(deps["Pinput"], dtype=float)
-
-    threshold = 1e-6
-    result = np.full_like(prad, np.nan)
-    valid_mask = pinput > threshold
-    
-    # 有効な値のみ計算
-    result[valid_mask] = prad[valid_mask] / pinput[valid_mask]
-    
-    return result
+    return deps["Pech"] + deps["Pnbi-tan-temporal"] + deps["Pnbi-perp-temporal"]*0.36

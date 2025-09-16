@@ -11,6 +11,7 @@ DATA_DIR: Path = SRC_DIR / "data"
 # each sub directory
 DATASETS_DIR: Path = DATA_DIR / "datasets"
 LOGS_DIR: Path = DATA_DIR / "logs"
+SAV_GOL_COMPARISON_DIR: Path = DATA_DIR / "savgol_comparison"
 
 EGDATA_DIR: Path = DATA_DIR / "egdata"
 SDL_LOOP_DATA_DIR: Path = DATA_DIR / "SDLloopdata"

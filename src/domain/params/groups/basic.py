@@ -108,13 +108,20 @@ def get_Ip(ctx: Context, deps):
     return f1_Ip(deps["time"])
 
 
-@param("Pech", deps=["time"], needs=["echpw"], doc="ECH power")
-def get_Pech(ctx: Context, deps):
-    eg_echpw = ctx.load_and_parse_raw_egdb("echpw")
-    time_list = np.array(eg_echpw["Time"], dtype=float)
-    Pech_list = np.array(eg_echpw["Total ECH"], dtype=float)
-    f1_Pech = interpolate.interp1d(time_list, Pech_list, bounds_error=False, fill_value=0)
-    return f1_Pech(deps["time"])
+@param("Prad_over_Pinput", deps=["Prad","Pinput"], needs=[], doc="Prad/Pinput ratio")
+def get_Prad_over_Pinput(ctx: Context, deps):
+    """Calculate Prad/Pinput ratio with proper handling of zero input power."""
+    prad = np.asarray(deps["Prad"], dtype=float)
+    pinput = np.asarray(deps["Pinput"], dtype=float)
+
+    threshold = 1e-6
+    result = np.full_like(prad, np.nan)
+    valid_mask = pinput > threshold
+    
+    # 有効な値のみ計算
+    result[valid_mask] = prad[valid_mask] / pinput[valid_mask]
+    
+    return result
 
 # 例：簡単な入力パワー（ダミー実装）
 # ここでは Pech, Pnbi-tan, Pnbi-perp を "nel のスカラー変換" として作るだけ

@@ -19,8 +19,3 @@ def load_config():
     path = os.path.join(CONFIG_DIR, 'config.yaml')
     with open(path) as f:
         return yaml.safe_load(f)
-    
-def get_eg_data_sources():
-    path = os.path.join(CONFIG_DIR, 'parameters.yaml')
-    with open(path) as f:
-        return yaml.safe_load(f)['data_sources']

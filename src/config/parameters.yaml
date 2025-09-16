@@ -1,22 +1,3 @@
-data_sources:
-  fircall: "{root}/fircall@{shotNO}.dat"
-  tsmap_nel: "{root}/tsmap_nel@{shotNO}.dat"
-  imp01: "{root}/imp01@{shotNO}.dat"
-  imp02: "{root}/imp02@{shotNO}.dat"
-  wp: "{root}/wp@{shotNO}.dat"
-  ip: "{root}/ip@{shotNO}.dat"
-  echpw: "{root}/echpw@{shotNO}.dat"
-  ha3: "{root}/ha3@{shotNO}.dat"
-  bolo: "{root}/bolo@{shotNO}.dat"
-  nb1pwr_temporal: "{root}/nb1pwr_temporal@{shotNO}.dat"
-  nb2pwr_temporal: "{root}/nb2pwr_temporal@{shotNO}.dat"
-  nb3pwr_temporal: "{root}/nb3pwr_temporal@{shotNO}.dat"
-  nb4apwr_temporal: "{root}/nb4apwr_temporal@{shotNO}.dat"
-  nb4bpwr_temporal: "{root}/nb4bpwr_temporal@{shotNO}.dat"
-  nb5apwr_temporal: "{root}/nb5apwr_temporal@{shotNO}.dat"
-  nb5bpwr_temporal: "{root}/nb5bpwr_temporal@{shotNO}.dat"
-  DivIis_tor_sum: "{root}/DivIis_tor_sum@{shotNO}.dat"
-
 parameters:
   # 基本情報
   - time
@@ -29,7 +10,7 @@ parameters:
   # 加熱パワー
   - Pech # ECH加熱
   - Pnbi-tan # NBI tangential
-  - Pnbi-perp # NBI perpendicular
+  # - Pnbi-perp # NBI perpendicular
   - Pinput # 総入力パワー
 
   # 放射・エネルギー
